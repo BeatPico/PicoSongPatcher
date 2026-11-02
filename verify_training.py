@@ -22,5 +22,6 @@ if __name__ == '__main__':
     else:
         os.chdir(ROOT)
         args = ['-q', 'test_model_profiles.py', 'ai_engine/test_finetune_beats.py',
-                'ai_engine/test_finetune_stages.py', 'ai_engine/test_evaluate_candidate.py']
+                'ai_engine/test_finetune_stages.py', 'ai_engine/test_evaluate_candidate.py',
+                'ai_engine/test_gameplay_options.py']
     sys.exit(pytest.main(args))

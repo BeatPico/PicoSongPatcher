@@ -18,6 +18,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('audio', nargs='+', type=Path)
     parser.add_argument('--profile', help='Candidate ID; defaults to newest evaluated model')
+    parser.add_argument('--baseline-profile',default='base',help='Model used for arm A')
+    parser.add_argument('--walls',action='store_true')
+    parser.add_argument('--bombs',action='store_true')
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
     models = [p for p in profiles(engine_root()) if p['id'] != 'base']
@@ -29,9 +32,10 @@ def main():
     output = args.output or ROOT / 'validation_training' / datetime.now(timezone.utc).strftime('audio-%Y%m%dT%H%M%SZ')
     output.mkdir(parents=True, exist_ok=False)
     library = Library(output / 'data')
+    library.state.update(ai_walls=args.walls,ai_bombs=args.bombs)
     records = []
     for index, source in enumerate(args.audio):
-        for arm, model in (('A', 'base'), ('B', candidate)):
+        for arm, model in (('A', args.baseline_profile), ('B', candidate)):
             library.state['ai_model'] = model
             entry, _ = generate(source, library, ROOT / 'assets', difficulties={'Easy': 1.5},
                                 log=lambda line: print(line, flush=True))
@@ -52,7 +56,7 @@ def main():
                 'model': model, 'revision': entry['ai_model_revision'], 'duration': entry['full_audio_seconds'],
                 'notes': analysis['difficulties'], 'archive': str(archive.resolve())})
     (output / 'comparison.json').write_text(json.dumps(records, ensure_ascii=False, indent=2), encoding='utf-8')
-    text = ['A — исходная модель. B — дообученная модель.',
+    text = ['A — '+args.baseline_profile+'. B — '+candidate+'.',
             'Easy, запрос 1.5 блока/с; одинаковый seed для одного исходного аудиофайла.',
             'Это примеры для прослушивания/игры, эталонной авторской карты для этих MP3 нет.',
             'ZIP можно добавить в патчер. Текущая библиотека не изменялась.', '']

@@ -6,21 +6,24 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-def train(engine, project, log=print, epochs=3):
+def train(engine, project, log=print, epochs=3, prepared_file=None, source_profile='base'):
     engine, project = Path(engine).resolve(), Path(project).resolve()
-    prepared = project / 'training_examples/preparation_result.json'
+    prepared = Path(prepared_file).resolve() if prepared_file else project / 'training_examples/preparation_result.json'
     if not prepared.is_file():
         raise ValueError('Нет подготовленных примеров. Сначала запусти prepare_training_examples.py в исходном проекте.')
     preparation = json.loads(prepared.read_text(encoding='utf-8'))
     for key in ('beat_dataset', 'v2_dataset'):
         if not (Path(preparation[key]) / 'manifest.json').is_file():
             raise ValueError('Не найден набор обучающих данных: ' + preparation[key])
+    from model_profiles import resolve_profile
+    parent=resolve_profile(engine,source_profile)
     run_id = datetime.now(timezone.utc).strftime('finetune-%Y%m%dT%H%M%S%fZ')
     run = engine / 'models/experiments' / run_id
     run.mkdir(parents=True)
-    job = {'id': run_id, 'run': str(run), 'source_bundle': str(engine / 'models/v2_expert'),
+    job = {'id': run_id, 'run': str(run), 'source_bundle': str(parent['bundle']),
            'beat_dataset': preparation['beat_dataset'], 'v2_dataset': preparation['v2_dataset'],
            'epochs': int(epochs), 'learning_rate': 1e-5, 'seed': 127,
+           'source_profile':source_profile,'prepared_file':str(prepared),'dataset_recordings':preparation.get('packages'),
            'ffmpeg': str(project / 'assets/tools/ffmpeg.exe')}
     job_path = run / 'job.json'
     job_path.write_text(json.dumps(job, indent=2), encoding='utf-8')

@@ -26,6 +26,7 @@ __pycache__/
 /integration_data/
 /integration_output/
 /training_examples/
+/training_examples_40/
 /ai_engine/runtime/
 /ai_engine/cache/
 /ai_engine/models/

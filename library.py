@@ -121,7 +121,7 @@ class Library:
         require(source.is_dir(),'Папка карты не найдена.')
         parsed=inspect_map(source,compatible)
         for entry in self.state['songs']:
-            if entry['hash']==parsed['hash']:
+            if entry.get('hash')==parsed['hash']:
                 entry.update(enabled=True,compatible=compatible,warnings=parsed['warnings'],
                     difficulties=[(x[1].get('_characteristic','Standard')+'/' if x[1].get('_characteristic','Standard')!='Standard' else '')+x[0] for x in parsed['difficulties']]);self.save();return entry,False
         key=parsed['hash'][:24]

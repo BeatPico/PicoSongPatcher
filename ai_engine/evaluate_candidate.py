@@ -331,6 +331,7 @@ def _generate_arm(arm, bundle, references, output, seed, log):
     from map_creation.v2_generation import scoped_settings, _difficulty_settings
     from map_creation.v2_export import serialize_beatmap
     from full_song import windows, blank, append_window, finish
+    from gameplay_options import seeded_generation
     _configure(bundle, config)
     _reseed(seed, config)
     log(f"Evaluation {arm}: loading explicit CPU production bundle")
@@ -366,7 +367,8 @@ def _generate_arm(arm, bundle, references, output, seed, log):
                     with scoped_settings():
                         _difficulty_settings(4 * nps)
                         _reseed(chart_seed, config)
-                        result = runtime.generate(prepared, nps, logger=lambda message: None)
+                        with seeded_generation(chart_seed):
+                            result = runtime.generate(prepared, nps, logger=lambda message: None)
                         chart, omissions = serialize_beatmap(result.state, 60., version="v3")
                         append_window(charts[song.song_id], chart, start, core_start, core_end)
                         parts[song.song_id].append({"part": part, "seed": chart_seed,
@@ -522,6 +524,7 @@ def evaluate(base_bundle, candidate_bundle, beat_dataset, v2_dataset, output, se
             decoder = {key: value for key, value in snapshot.items()
                        if key.startswith("v2_") or key in ("add_bombs_flag", "add_obstacle_flag", "add_slider_flag", "min_time_diff")}
             report = {"kind": "frozen_heldout_production_ab_evaluation", "schema_version": 1,
+                "rng_control": "explicit per-variant NumPy Generator; scoped Python and legacy NumPy RNG states",
                 "created_at_utc": datetime.now(timezone.utc).isoformat(), "device": "CPU", "seed": seed,
                 "evaluation_split": "test", "test_used_for_fitting_or_selection": False,
                 "split_audit": audit, "candidate_fine_tuning_audit": fine_audit,

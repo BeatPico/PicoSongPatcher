@@ -79,10 +79,16 @@ def run(job):
         raise ValueError('Candidate and source bundle must be separate')
     config.v1_lighting_model_path = str(source / 'v1_lighting/tf_event_gen_2_12_5_5__22_18.h5')
     config.v1_lighting_vocabulary_path = str(source / 'v1_lighting/onehot_encoder_events.pkl')
-    original = {str(p.relative_to(source)): sha(p) for p in source.rglob('*') if p.is_file()}
-    result = {'id': job['id'], 'status': 'training', 'source_bundle': str(source),
+    original = {p.relative_to(source).as_posix(): sha(p) for p in source.rglob('*') if p.is_file()}
+    resume=bool(job.get('resume_after_training',False))
+    result = read(run_dir/'result.json') if resume else {'id': job['id'], 'status': 'training', 'source_bundle': str(source),
+              'source_profile':job.get('source_profile','base'),'dataset_recordings':job.get('dataset_recordings'),
               'created_at': datetime.now(timezone.utc).isoformat(), 'stages': {},
               'active_model_changed': False, 'training_device': 'CPU'}
+    prior_hashes=result.get('dataset_hashes') if resume else None
+    if resume:
+        result.setdefault('resume_history',[]).append({'previous_error':result.pop('error',None),'optimizer_steps_repeated':0})
+        result['status']='assembling'
     write(run_dir / 'result.json', result)
     try:
         log('Проверка разделения записей и совместимости данных…')
@@ -90,13 +96,23 @@ def run(job):
         downstream = load_v2(job['v2_dataset'])
         result['split_charts'] = check_splits(songs, downstream)
         result['dataset_hashes'] = {key: sha(Path(job[key]) / 'manifest.json') for key in ('beat_dataset', 'v2_dataset')}
+        if resume and prior_hashes!=result['dataset_hashes']:raise ValueError('Cannot resume with changed training datasets')
         del songs, manifest, downstream
         for stage in ('intensity', 'timing', 'positions', 'arrows', 'multiplier', 'hazards', 'arcs'):
-            log('Дообучение: ' + stage)
-            trainer = train_beat if stage in ('intensity', 'timing') else train_stage
-            dataset = job['beat_dataset'] if stage in ('intensity', 'timing') else job['v2_dataset']
-            record = trainer(stage, dataset, source / stage, run_dir / 'stages' / stage,
-                             epochs=job['epochs'], learning_rate=job['learning_rate'], seed=job['seed'], log=log)
+            if resume:
+                record=result['stages'][stage]
+                if record.get('status')=='trained':
+                    saved=read(run_dir/'stages'/stage/'manifest.json')
+                    if sha(run_dir/'stages'/stage/'best.keras')!=saved['checkpoint_sha256']:raise ValueError('Saved checkpoint changed: '+stage)
+                    if sha(source/stage/'best.keras')!=record['source_checkpoint_sha256']:raise ValueError('Parent checkpoint changed: '+stage)
+                    if sha(source/stage/'manifest.json')!=record['source_manifest_sha256']:raise ValueError('Parent manifest changed: '+stage)
+                log('Сохранённые веса проверены: '+stage)
+            else:
+                log('Дообучение: ' + stage)
+                trainer = train_beat if stage in ('intensity', 'timing') else train_stage
+                dataset = job['beat_dataset'] if stage in ('intensity', 'timing') else job['v2_dataset']
+                record = trainer(stage, dataset, source / stage, run_dir / 'stages' / stage,
+                                 epochs=job['epochs'], learning_rate=job['learning_rate'], seed=job['seed'], log=log)
             result['stages'][stage] = record
             write(run_dir / 'result.json', result)
             import gc
@@ -105,15 +121,25 @@ def run(job):
             gc.collect()
         log('Сборка отдельной модели для сравнения…')
         candidate = run_dir / 'bundle'
+        if candidate.exists():
+            require_backup=run_dir/('bundle_before_repair_'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ'))
+            if not resume or candidate.resolve().parent!=run_dir or require_backup.resolve().parent!=run_dir:raise ValueError('Candidate destination already exists')
+            candidate.rename(require_backup)
         shutil.copytree(source, candidate)
         bundle = read(candidate / 'bundle.json')
+        result['limitations']=[]
         for stage, record in result['stages'].items():
             trained = run_dir / 'stages' / stage
             if not (trained / 'best.keras').is_file():
                 continue
+            if not record.get('selected_weights_changed',record.get('best_epoch',0)>0):
+                # Epoch zero is the parent artifact, including its training and
+                # calibration identity. Rejected updates remain in run/stages.
+                record['selected_manifest_source']='parent'
+                continue
             # Replace files only inside this new, disposable candidate.
             shutil.copytree(trained, candidate / stage, dirs_exist_ok=True)
-            if stage in ('hazards', 'arcs') and sha(trained / 'best.keras') != original.get(stage + '/best.keras'):
+            if stage in bundle.get('calibrations',{}) and sha(trained / 'best.keras') != original.get(stage + '/best.keras'):
                 bundle.get('calibrations', {}).pop(stage, None)
                 result.setdefault('limitations', []).append(stage + ': pretrained calibration removed after weight update; frozen default threshold used, no test-set fitting')
         # Stale provenance such as the original CPU verification is not evidence
@@ -133,16 +159,20 @@ def run(job):
         write(run_dir / 'result.json', result)
         log('Итоговое сравнение на отложенной записи…')
         from evaluate_candidate import evaluate
+        evaluation_dir=run_dir/'evaluation'
+        if (evaluation_dir/'evaluation.json').exists() or (evaluation_dir/'review_packages').exists():
+            evaluation_dir=run_dir/('evaluation_resume_'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ'))
         result['evaluation'] = evaluate(source, candidate, job['beat_dataset'], job['v2_dataset'],
-                                        run_dir / 'evaluation', seed=job['seed'], log=log)
+                                        evaluation_dir, seed=job['seed'], log=log)
         if any(sha(source / name) != digest for name, digest in original.items()):
             raise RuntimeError('Original model changed during training')
         result.update(status='evaluated', trained=True, original_model_unchanged=True,
-                      report=str(run_dir / 'evaluation'), candidate_bundle=str(candidate))
+                      report=str(evaluation_dir), candidate_bundle=str(candidate))
         write(run_dir / 'result.json', result)
         write(run_dir / 'profile.json', {'id': job['id'], 'status': 'evaluated',
-            'label': 'Дообученная · ' + job['id'][9:24], 'experimental': True,
-            'report': 'evaluation', 'created_at': result['created_at']})
+            'label': 'Дообученная · ' + (str(job['dataset_recordings'])+' песен · ' if job.get('dataset_recordings') else '')+job['id'][9:24], 'experimental': True,
+            'source_profile':job.get('source_profile','base'),'dataset_recordings':job.get('dataset_recordings'),
+            'report': evaluation_dir.name, 'created_at': result['created_at']})
         log('Дообучение и сравнение завершены. Новая модель доступна для выбора; исходная сохранена.')
         return result
     except Exception as error:

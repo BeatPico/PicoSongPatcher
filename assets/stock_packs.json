@@ -1,0 +1,1824 @@
+{
+  "base_sha256": "13fc1e957231820bed4c4189be36ccbd9083404594d3fce175b00443da09f0f5",
+  "packs": [
+    {
+      "id": "billieeilish",
+      "path": "assets/aa/Android/billieeilish_pack_assets_all_693c173d339690cde24ada5004e0381f.bundle",
+      "collection": "BillieEilishBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "BillieEilishBeatmapLevelPack",
+          "_packID": "BillieEilish",
+          "_packName": "Billie Eilish",
+          "_shortPackName": "Billie Eilish",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 6609759990815045557
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -5311669809929793298
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 3249676372246210910
+          }
+        }
+      ],
+      "loudness": [
+        "BillieEilishPackDefinition",
+        "BillieEilish_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "AllTheGoodGirlsGoToHell",
+        "BadGuy",
+        "Bellyache",
+        "BuryAFriend",
+        "HappierThanEver",
+        "IDidntChangeMyNumber",
+        "NDA",
+        "Oxytocin",
+        "ThereforeIAm",
+        "YouShouldSeeMeInACrown"
+      ]
+    },
+    {
+      "id": "britneyspears",
+      "path": "assets/aa/Android/britneyspears_pack_assets_all_f99e87d04af9bd8cdc0efdcb59cc774f.bundle",
+      "collection": "BritneySpears_BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "BritneySpearsBeatmapLevelPack",
+          "_packID": "BritneySpears",
+          "_packName": "Britney Spears",
+          "_shortPackName": "Britney Spears",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -749145155695634468
+          },
+          "_smallCoverImage": {
+            "m_FileID": 3,
+            "m_PathID": -2222437484040482246
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -8387305415334800395
+          }
+        }
+      ],
+      "loudness": [
+        "BritneySpears_PerceivedLoudness",
+        "BritneySpears_PackDefinition"
+      ],
+      "stock_levels": [
+        "BabyOneMoreTime",
+        "Circus",
+        "GimmeMore",
+        "ImASlave4U",
+        "MeAgainstTheMusic",
+        "OopsIDidItAgain",
+        "Overprotected",
+        "Scream&Shout",
+        "TillTheWorldEnds",
+        "Toxic",
+        "Womanizer"
+      ]
+    },
+    {
+      "id": "bts",
+      "path": "assets/aa/Android/bts_pack_assets_all_1a54873d821282af72fe7b782e849cca.bundle",
+      "collection": "BTSBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "BTSBeatmapLevelPack",
+          "_packID": "BTS",
+          "_packName": "BTS Music Pack",
+          "_shortPackName": "BTS",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 5447466866418264881
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": 500831278883321333
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -6249661856290892658
+          }
+        }
+      ],
+      "loudness": [
+        "BTSPackDefinition",
+        "BTS_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "BloodSweatAndTears",
+        "BoyWithLuv",
+        "BurningUp",
+        "Dionysus",
+        "Dna",
+        "Dope",
+        "Dynamite",
+        "FakeLove",
+        "Idol",
+        "MicDrop",
+        "NotToday",
+        "Ugh"
+      ]
+    },
+    {
+      "id": "camellia",
+      "path": "assets/aa/Android/camellia_pack_assets_all_ea573d4010b9406605e2e52d12ad563f.bundle",
+      "collection": "CamelliaBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "CamelliaBeatmapLevelPack",
+          "_packID": "Camellia",
+          "_packName": "Camellia Music Pack",
+          "_shortPackName": "Camellia",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -7444174449004870573
+          },
+          "_smallCoverImage": {
+            "m_FileID": 3,
+            "m_PathID": -4340729680565311212
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 8021719752231546189
+          }
+        }
+      ],
+      "loudness": [
+        "CamelliaPackDefinition",
+        "Camellia_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "ExitThisEarthsAtomosphere",
+        "Ghost",
+        "LightItUp",
+        "Crystallized",
+        "CycleHit",
+        "WhatTheCat"
+      ]
+    },
+    {
+      "id": "daftpunk",
+      "path": "assets/aa/Android/daftpunk_pack_assets_all_9f68fad4bd41d8707b1ba120c01b26bd.bundle",
+      "collection": "DaftPunkBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "DaftPunkBeatmapLevelPack",
+          "_packID": "DaftPunk",
+          "_packName": "Daft Punk Music Pack",
+          "_shortPackName": "Daft Punk",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 4998757517245140683
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -2597681149871990962
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -8744388131049120799
+          }
+        }
+      ],
+      "loudness": [
+        "DaftPunk_PackDefinition",
+        "DaftPunk_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "AroundTheWorld",
+        "AroundTheWorldHarderBetterFasterStronger",
+        "DaFunkDaftendirekt",
+        "GetLucky",
+        "HarderBetterFasterStronger",
+        "LoseYourselfToDance",
+        "OneMoreTime",
+        "PrimeTimeOfYourLifeBrainwasherRollinAliveLive2007",
+        "Technologic",
+        "VeridisQuo"
+      ]
+    },
+    {
+      "id": "debug",
+      "path": "assets/aa/Android/debug_pack_assets_all_6a1125fccf31ad0884f1bb5f424dcbce.bundle",
+      "collection": "DebugBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "DebugBeatmapLevelPack",
+          "_packID": "Debug",
+          "_packName": "Debug",
+          "_shortPackName": "Debug",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 6342404692700847652
+          },
+          "_smallCoverImage": {
+            "m_FileID": 3,
+            "m_PathID": 829345133759880106
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 7889428793525101379
+          }
+        }
+      ],
+      "loudness": [
+        "DebugPackDefinition",
+        "Debug_PerceivedLoudness"
+      ],
+      "stock_levels": [
+        "Metronome",
+        "PerformanceTest",
+        "ArtTeamTest"
+      ]
+    },
+    {
+      "id": "edm",
+      "path": "assets/aa/Android/edm_pack_assets_all_39f721127d5097adf11e0cf730cbce5d.bundle",
+      "collection": "EDMBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "EDMBeatmapLevelPack",
+          "_packID": "EDM",
+          "_packName": "Electronic Mixtape",
+          "_shortPackName": "Electronic Mixtape",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -5245310988238730534
+          },
+          "_smallCoverImage": {
+            "m_FileID": 3,
+            "m_PathID": 5905909328274781093
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 3735945478640833757
+          }
+        }
+      ],
+      "loudness": [
+        "EDM_PerceivedLoudnessPerLevel",
+        "EDMPackDefinition"
+      ],
+      "stock_levels": [
+        "Alone",
+        "Animals",
+        "Freestyler",
+        "GhostsNStuff",
+        "Icarus",
+        "Sandstorm",
+        "StayTheNight",
+        "TheRockafellerSkank",
+        "WaitingAllNight",
+        "Witchcraft"
+      ]
+    },
+    {
+      "id": "extras",
+      "path": "assets/aa/Android/extras_pack_assets_all_e943da026b6f09890bf3681f981f96fe.bundle",
+      "collection": "ExtrasBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "ExtrasBeatmapLevelPack",
+          "_packID": "Extras",
+          "_packName": "Extras",
+          "_shortPackName": "Extras",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -8476082778931200283
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -8653531855689526327
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -7134688357738011586
+          }
+        }
+      ],
+      "loudness": [
+        "ExtrasPackDefinition",
+        "Extras_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "Danger",
+        "100BillsRemix",
+        "EscapeRemix",
+        "SpookyBeat",
+        "FitBeat",
+        "CrabRave",
+        "PopStars",
+        "OneHope",
+        "AngelVoices"
+      ]
+    },
+    {
+      "id": "falloutboy",
+      "path": "assets/aa/Android/falloutboy_pack_assets_all_50d6daef2fc51e565c1496be1f3e4062.bundle",
+      "collection": "FallOutBoyBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "FallOutBoyBeatmapLevelPack",
+          "_packID": "FallOutBoy",
+          "_packName": "Fall Out Boy",
+          "_shortPackName": "Fall Out Boy",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -2945290100323784918
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -2445672668504710445
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 6299402759983184607
+          }
+        }
+      ],
+      "loudness": [
+        "FallOutBoyPackDefinition",
+        "FallOutBoy_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "Centuries",
+        "DanceDance",
+        "IDontCare",
+        "Immortals",
+        "Irresistible",
+        "MySongsKnow",
+        "ThisAintAScene",
+        "ThnksFrThMmrs"
+      ]
+    },
+    {
+      "id": "greenday",
+      "path": "assets/aa/Android/greenday_pack_assets_all_3face832c48563b34a2ed6ea7515dff7.bundle",
+      "collection": "GreenDayBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "GreenDayBeatmapLevelPack",
+          "_packID": "GreenDay",
+          "_packName": "Green Day Music Pack",
+          "_shortPackName": "Green Day",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -8602379726290978021
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": 3383562259874600659
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 2911780822699027732
+          }
+        }
+      ],
+      "loudness": [
+        "GreenDayPackDefinition",
+        "GreenDay_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "AmericanIdiot",
+        "FatherOfAll",
+        "BoulevardOfBrokenDreams",
+        "Holiday",
+        "FireReadyAim",
+        "Minority"
+      ]
+    },
+    {
+      "id": "hiphop",
+      "path": "assets/aa/Android/hiphop_pack_assets_all_b4b0fb8ca7a3c966bdcbd43055c9f6d1.bundle",
+      "collection": "HipHopBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "HipHopBeatmapLevelPack",
+          "_packID": "HipHop",
+          "_packName": "Hip Hop Mixtape",
+          "_shortPackName": "Hip Hop Mixtape",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -8586581083476005858
+          },
+          "_smallCoverImage": {
+            "m_FileID": 3,
+            "m_PathID": -3509777745955125708
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 3,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 2448019117052875798
+          }
+        }
+      ],
+      "loudness": [
+        "HipHop_PerceivedLoudness",
+        "HipHop_PackDefinition"
+      ],
+      "stock_levels": [
+        "AllEyezOnMe",
+        "Anaconda",
+        "GinAndJuice",
+        "Godzilla",
+        "HeyYA",
+        "Hypnotize",
+        "NuthinButAGThang",
+        "TheMessage",
+        "TheWoo"
+      ]
+    },
+    {
+      "id": "imaginedragons",
+      "path": "assets/aa/Android/imaginedragons_pack_assets_all_7afad30e397e6ca869a6b62eae2ea417.bundle",
+      "collection": "ImagineDragonsBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "ImagineDragonsBeatmapLevelPack",
+          "_packID": "ImagineDragons",
+          "_packName": "Imagine Dragons Music Pack",
+          "_shortPackName": "Imagine Dragons",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -6847988221850083501
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -314676558614083551
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 7840995218925966404
+          }
+        }
+      ],
+      "loudness": [
+        "ImagineDragonsPackDefinition",
+        "ImagineDragons_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "Bones",
+        "Enemy",
+        "BadLiar",
+        "Believer",
+        "Digital",
+        "ItsTime",
+        "Machine",
+        "Natural",
+        "Radioactive",
+        "Thunder",
+        "Warriors",
+        "WhateverItTakes"
+      ]
+    },
+    {
+      "id": "interscope",
+      "path": "assets/aa/Android/interscope_pack_assets_all_3fd6ea45638cf2bbb3d58c40d98494e3.bundle",
+      "collection": "InterscopeBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "InterscopeBeatmapLevelPack",
+          "_packID": "Interscope",
+          "_packName": "Interscope Mixtape",
+          "_shortPackName": "Interscope",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -6129298701496817105
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": 1422997653618639178
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -170180659349943293
+          }
+        }
+      ],
+      "loudness": [
+        "Interscope_PerceivedLoudnessPerLevel",
+        "InterscopePackDefinition"
+      ],
+      "stock_levels": [
+        "CountingStars",
+        "DnaLamar",
+        "DontCha",
+        "PartyRockAnthem",
+        "Rollin",
+        "Sugar",
+        "TheSweetEscape"
+      ]
+    },
+    {
+      "id": "ladygaga",
+      "path": "assets/aa/Android/ladygaga_pack_assets_all_c7896a614e04d4eb894c6c1719be96ca.bundle",
+      "collection": "LadyGagaBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "LadyGagaBeatmapLevelPack",
+          "_packID": "LadyGaga",
+          "_packName": "Lady Gaga Music Pack",
+          "_shortPackName": "Lady Gaga",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 8807051934645175842
+          },
+          "_smallCoverImage": {
+            "m_FileID": 3,
+            "m_PathID": -7396681915505309055
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -1669597432477377251
+          }
+        }
+      ],
+      "loudness": [
+        "LadyGaga_PerceivedLoudnessPerLevel",
+        "LadyGagaPackDefinition"
+      ],
+      "stock_levels": [
+        "Alejandro",
+        "BadRomance",
+        "BornThisWay",
+        "JustDance",
+        "Paparazzi",
+        "PokerFace",
+        "RainOnMe",
+        "StupidLove",
+        "Telephone",
+        "TheEdgeOfGlory"
+      ]
+    },
+    {
+      "id": "linkinpark2",
+      "path": "assets/aa/Android/linkinpark2_pack_assets_all_a7cdee4e0454afeb54df81451b236301.bundle",
+      "collection": "LinkinPark2BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "LinkinPark2BeatmapLevelPack",
+          "_packID": "LinkinPark2",
+          "_packName": "Linkin Park x Mike Shinoda Music Pack",
+          "_shortPackName": "Linkin Park x Mike Shinoda",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -2199982852247414414
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -2427993973725154539
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 2,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 8880567393934170841
+          }
+        }
+      ],
+      "loudness": [
+        "LinkinPark2_PackDefinition",
+        "LinkinPark2_PerceivedLoudness"
+      ],
+      "stock_levels": [
+        "AlreadyOver",
+        "Crawling",
+        "FightingMyself",
+        "InMyHead",
+        "Lost",
+        "MoreTheVictim",
+        "NumbEncore",
+        "RememberTheName"
+      ]
+    },
+    {
+      "id": "linkinpark",
+      "path": "assets/aa/Android/linkinpark_pack_assets_all_d7c2a0a22ec6db6c5da57a8dc91e9228.bundle",
+      "collection": "LinkinParkBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "LinkinParkBeatmapLevelPack",
+          "_packID": "LinkinPark",
+          "_packName": "Linkin Park Music Pack",
+          "_shortPackName": "Linkin Park",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -867523280747282997
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -717500813562435053
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 2,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 6087585825742922265
+          }
+        }
+      ],
+      "loudness": [
+        "LinkinParkPackDefinition",
+        "LinkinPark_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "BleedItOut",
+        "BreakingTheHabit",
+        "Faint",
+        "GivenUp",
+        "InTheEnd",
+        "NewDivide",
+        "Numb",
+        "OneStepCloser",
+        "Papercut",
+        "SomewhereIBelong",
+        "WhatIveDone"
+      ]
+    },
+    {
+      "id": "lizzo",
+      "path": "assets/aa/Android/lizzo_pack_assets_all_88d1d2111032c004bb30ec3ed45347be.bundle",
+      "collection": "Lizzo_BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "Lizzo_BeatmapLevelPack",
+          "_packID": "Lizzo",
+          "_packName": "Lizzo Music Pack",
+          "_shortPackName": "Lizzo",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 1543661833754648020
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -6165846567596377070
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -8802182120598272434
+          }
+        }
+      ],
+      "loudness": [
+        "Lizzo_PackDefinition",
+        "Lizzo__PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "2BeLoved",
+        "AboutDamnTime",
+        "CuzILoveYou",
+        "EverybodysGay",
+        "GoodAsHell",
+        "Juice",
+        "Tempo",
+        "TruthHurts",
+        "Worship"
+      ]
+    },
+    {
+      "id": "metallica",
+      "path": "assets/aa/Android/metallica_pack_assets_all_ff09915684ade01579d2ebe98c7942f0.bundle",
+      "collection": "Metallica_BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "MetallicaBeatmapLevelPack",
+          "_packID": "Metallica",
+          "_packName": "Metallica",
+          "_shortPackName": "Metallica",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -5122479128117807356
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -8224721903045224453
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -6840864171335278524
+          }
+        }
+      ],
+      "loudness": [
+        "Metallica_PerceivedLoudness",
+        "Metallica_PackDefinition"
+      ],
+      "stock_levels": [
+        "AtlasRise",
+        "Battery",
+        "Blackened",
+        "CreepingDeath",
+        "EnterSandman",
+        "FadeToBlack",
+        "ForWhomTheBellTolls",
+        "Fuel",
+        "HitTheLights",
+        "KingNothing",
+        "LuxAeterna",
+        "MasterOfPuppets",
+        "NothingElseMatters",
+        "One",
+        "SadButTrue",
+        "SeekAndDestroy",
+        "TheUnforgiven"
+      ]
+    },
+    {
+      "id": "monstercatvol2",
+      "path": "assets/aa/Android/monstercatvol2_pack_assets_all_572ccfc5491e98eaf1e9e45e7e9fd0e2.bundle",
+      "collection": "MonstercatVol2_BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "MonstercatVol2BeatmapLevelPack",
+          "_packID": "MonstercatVol2",
+          "_packName": "Monstercat Mixtape 2",
+          "_shortPackName": "Monstercat Mixtape 2",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 3841619113274561139
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": 4877502104271485777
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -1646632598106388003
+          }
+        }
+      ],
+      "loudness": [
+        "MonstercatVol2_PerceivedLoudness",
+        "MonstercatVol2_PackDefinition"
+      ],
+      "stock_levels": [
+        "Accelerate",
+        "Dabadabadabadaba",
+        "DeadManWalking",
+        "Endgame",
+        "FinalBoss",
+        "MemoryBank",
+        "Mercenary",
+        "Pump",
+        "Rad",
+        "RIOT",
+        "ThronesOfBlood",
+        "WakeUp"
+      ]
+    },
+    {
+      "id": "monstercat",
+      "path": "assets/aa/Android/monstercat_pack_assets_all_7737e9d33c4dfbd364e643a72f4ad2c0.bundle",
+      "collection": "MonstercatBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "MonstercatBeatmapLevelPack",
+          "_packID": "Monstercat",
+          "_packName": "Monstercat Music Pack Vol. 1",
+          "_shortPackName": "Monstercat Vol. 1",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -6319173707088959332
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -1565777927225123097
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -4940718589049938007
+          }
+        }
+      ],
+      "loudness": [
+        "MonstercatPackDefinition",
+        "Monstercat_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "Boundless",
+        "EmojiVIP",
+        "Epic",
+        "FeelingStronger",
+        "Overkill",
+        "Rattlesnake",
+        "Stronger",
+        "ThisTime",
+        "TillItsOver",
+        "WeWontBeAlone"
+      ]
+    },
+    {
+      "id": "ostvol1",
+      "path": "assets/aa/Android/ostvol1_pack_assets_all_12bdc0fa893016f37e65b5c353040c02.bundle",
+      "collection": "OstVol1BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "OstVol1BeatmapLevelPack",
+          "_packID": "OstVol1",
+          "_packName": "Original Soundtrack Vol. 1",
+          "_shortPackName": "Original Soundtrack Vol. 1",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -256556584068977626
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": 6153210736313531798
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -8565963014661215848
+          }
+        }
+      ],
+      "loudness": [
+        "OST1_PerceivedLoudnessPerLevel",
+        "OstVol1_PackDefinition"
+      ],
+      "stock_levels": [
+        "100Bills",
+        "BalearicPumping",
+        "BeatSaber",
+        "Breezer",
+        "CommercialPumping",
+        "CountryRounds",
+        "Escape",
+        "Legend",
+        "LvlInsane",
+        "TurnMeOn"
+      ]
+    },
+    {
+      "id": "ostvol2",
+      "path": "assets/aa/Android/ostvol2_pack_assets_all_b6beb17942bc3c1cf1a58c34fa0747bc.bundle",
+      "collection": "OstVol2BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "OstVol2BeatmapLevelPack",
+          "_packID": "OstVol2",
+          "_packName": "Original Soundtrack Vol. 2",
+          "_shortPackName": "Original Soundtrack Vol. 2",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 8360764221539783248
+          },
+          "_smallCoverImage": {
+            "m_FileID": 3,
+            "m_PathID": -7546201251008473301
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -8836330454876015579
+          }
+        }
+      ],
+      "loudness": [
+        "OstVol2_PackDefinition",
+        "OST2_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "BeThereForYou",
+        "Elixia",
+        "INeedYou",
+        "RumNBass",
+        "UnlimitedPower"
+      ]
+    },
+    {
+      "id": "ostvol3",
+      "path": "assets/aa/Android/ostvol3_pack_assets_all_204eba7a1aea41cfff741f44d3580e69.bundle",
+      "collection": "OstVol3BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "OstVol3BeatmapLevelPack",
+          "_packID": "OstVol3",
+          "_packName": "Original Soundtrack Vol. 3",
+          "_shortPackName": "Original Soundtrack Vol. 3",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -2893994224907015963
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": 8414634006674625967
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 8424838050116420413
+          }
+        }
+      ],
+      "loudness": [
+        "OstVol3_PackDefinition",
+        "OST3_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "Origins",
+        "ReasonForLiving",
+        "GiveALittleLove",
+        "FullCharge",
+        "Immortal",
+        "BurningSands"
+      ]
+    },
+    {
+      "id": "ostvol4",
+      "path": "assets/aa/Android/ostvol4_pack_assets_all_5bb30d77dfc1d740588d990d4ee23bcd.bundle",
+      "collection": "OstVol4BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "OstVol4BeatmapLevelPack",
+          "_packID": "OstVol4",
+          "_packName": "Original Soundtrack Vol. 4",
+          "_shortPackName": "Original Soundtrack Vol. 4",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 8608361375168024295
+          },
+          "_smallCoverImage": {
+            "m_FileID": 3,
+            "m_PathID": 3600005621815483902
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 8940579823871618627
+          }
+        }
+      ],
+      "loudness": [
+        "OstVol4_PackDefinition",
+        "OST4_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "IntoTheDream",
+        "ItTakesMe",
+        "LudicrousPlus",
+        "SpinEternally"
+      ]
+    },
+    {
+      "id": "ostvol5",
+      "path": "assets/aa/Android/ostvol5_pack_assets_all_88b10be142923792b2672052fa6d221f.bundle",
+      "collection": "OstVol5BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "OstVol5BeatmapLevelPack",
+          "_packID": "OstVol5",
+          "_packName": "Original Soundtrack Vol. 5",
+          "_shortPackName": "Original Soundtrack Vol. 5",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -8820623331966157904
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -5773033072568958351
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 7148796325563215271
+          }
+        }
+      ],
+      "loudness": [
+        "OstVol5_PackDefinition",
+        "OST5_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "DollarSeventyEight",
+        "CurtainsAllNightLong",
+        "FinalBossChan",
+        "Firestarter",
+        "IWannaBeAMachine",
+        "Magic"
+      ]
+    },
+    {
+      "id": "ostvol6",
+      "path": "assets/aa/Android/ostvol6_pack_assets_all_05701af5f489bbd728160a2554084a75.bundle",
+      "collection": "OstVol6BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "OstVol6BeatmapLevelPack",
+          "_packID": "OstVol6",
+          "_packName": "Original Soundtrack Vol. 6",
+          "_shortPackName": "Original Soundtrack Vol. 6",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 3825743557234605242
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -33790245133132941
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 1737997932525025352
+          }
+        }
+      ],
+      "loudness": [
+        "OstVol6_PerceivedLoudness",
+        "OstVol6_PackDefinition"
+      ],
+      "stock_levels": [
+        "Cathedral",
+        "HeavyWeight",
+        "LiftOff",
+        "PowerOfTheSaberBlade",
+        "TempoKatana"
+      ]
+    },
+    {
+      "id": "ostvol7",
+      "path": "assets/aa/Android/ostvol7_pack_assets_all_c16587a0daed587b113c125042b910da.bundle",
+      "collection": "OstVol7BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "OstVol7BeatmapLevelPack",
+          "_packID": "OstVol7",
+          "_packName": "Original Soundtrack Vol. 7",
+          "_shortPackName": "Original Soundtrack Vol. 7",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -3278732743078629186
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": 3433028087939437895
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 5396525704876191750
+          }
+        }
+      ],
+      "loudness": [
+        "OstVol7_PackDefinition",
+        "OstVol7_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "Damage",
+        "Lustre",
+        "TheMaster",
+        "Untamed",
+        "WorldWideWeb"
+      ]
+    },
+    {
+      "id": "panicatthedisco",
+      "path": "assets/aa/Android/panicatthedisco_pack_assets_all_1ffc6dcce7dea473c8bbefc9b5e89889.bundle",
+      "collection": "PanicAtTheDiscoBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "PanicAtTheDiscoBeatmapLevelPack",
+          "_packID": "PanicAtTheDisco",
+          "_packName": "Panic! At The Disco Music Pack",
+          "_shortPackName": "Panic! At The Disco",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -3942960939097972401
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -3889660460892314386
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 1002768142537522084
+          }
+        }
+      ],
+      "loudness": [
+        "PanicAtTheDiscoPackDefinition",
+        "PanicAtTheDisco_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "CrazyGenius",
+        "DancingsNotACrime",
+        "HeyLookMaIMadeIt",
+        "SayAmen",
+        "SugarSoaker",
+        "VivaLasVengeance",
+        "EmperorsNewClothes",
+        "HighHopes",
+        "TheGreatestShow",
+        "Victorious"
+      ]
+    },
+    {
+      "id": "queen",
+      "path": "assets/aa/Android/queen_pack_assets_all_a2621daa1078a516519504debe022fc1.bundle",
+      "collection": "QueenBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "QueenBeatmapLevelPack",
+          "_packID": "Queen",
+          "_packName": "Queen Music Pack",
+          "_shortPackName": "Queen",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 1387008456707547058
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": -4366563764758919102
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 5135352626102447844
+          }
+        }
+      ],
+      "loudness": [
+        "QueenPackDefinition",
+        "Queen_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "AnotherOneBitesTheDust",
+        "BohemianRhapsody",
+        "CrazyLittleThingCalledLove",
+        "DontStopMeNow",
+        "IWantItAll",
+        "KillerQueen",
+        "OneVision",
+        "SomebodyToLove",
+        "StoneColdCrazy",
+        "WeAreTheChampions",
+        "WeWillRockYou"
+      ]
+    },
+    {
+      "id": "rocketleague",
+      "path": "assets/aa/Android/rocketleague_pack_assets_all_9f35008a356b8db554318c6a93da6514.bundle",
+      "collection": "RocketLeagueBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "RocketLeagueBeatmapLevelPack",
+          "_packID": "RocketLeague",
+          "_packName": "Rocket League x Monstercat Music Pack",
+          "_shortPackName": "Rocket League x Monstercat",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -7630285337104227019
+          },
+          "_smallCoverImage": {
+            "m_FileID": 3,
+            "m_PathID": -5018326281553772942
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 2543863336694867788
+          }
+        }
+      ],
+      "loudness": [
+        "RocketLeaguePackDefinition",
+        "RocketLeague_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "Play",
+        "Glide",
+        "LuvUNeedU",
+        "RockIt",
+        "Shiawase",
+        "TestMe"
+      ]
+    },
+    {
+      "id": "rockmixtape",
+      "path": "assets/aa/Android/rockmixtape_pack_assets_all_6fc89fdb3785f3323e917554c3be4b5a.bundle",
+      "collection": "RockMixtapeBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "RockMixtapeBeatmapLevelPack",
+          "_packID": "RockMixtape",
+          "_packName": "Rock Mixtape Music Pack",
+          "_shortPackName": "Rock Mixtape",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 2035817058444173093
+          },
+          "_smallCoverImage": {
+            "m_FileID": 3,
+            "m_PathID": 4710312657766522882
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -2358568235381848958
+          }
+        }
+      ],
+      "loudness": [
+        "RockMixtape_PerceivedLoudnessPerLevel",
+        "RockMixtapePackDefinition"
+      ],
+      "stock_levels": [
+        "BornToBeWild",
+        "EyeOfTheTiger",
+        "FreeBird",
+        "IWasMadeLovingYou",
+        "SevenNationArmy",
+        "SmellsLikeTeenSpirit",
+        "SweetChildOMine",
+        "ThePretender"
+      ]
+    },
+    {
+      "id": "shockdrop",
+      "path": "assets/aa/Android/shockdrop_pack_assets_all_52ffe19a045451d48c3ef3d0a883c3ca.bundle",
+      "collection": "ShockDrop_BeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "ShockDropBeatmapLevelPack",
+          "_packID": "ShockDrop",
+          "_packName": "Shock Drops",
+          "_shortPackName": "Shock Drops",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 2691480590065869638
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": 964006555079730008
+          },
+          "_packBuyOption": 1,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -2830696960400470695
+          }
+        }
+      ],
+      "loudness": [
+        "ShockDrop_PerceivedLoudness",
+        "ShockDrop_PackDefinition"
+      ],
+      "stock_levels": [
+        "Houdini",
+        "NotLikeUs",
+        "Abracadabra",
+        "BirdsOfAFeather",
+        "Espresso"
+      ]
+    },
+    {
+      "id": "skrillex",
+      "path": "assets/aa/Android/skrillex_pack_assets_all_543d34cc6756f41aa4e1bacefbdf8595.bundle",
+      "collection": "SkrillexBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "SkrillexBeatmapLevelPack",
+          "_packID": "Skrillex",
+          "_packName": "Skrillex Music Pack",
+          "_shortPackName": "Skrillex",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -7726712738362933261
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": 82953145150435028
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": 4269158972529806363
+          }
+        }
+      ],
+      "loudness": [
+        "SkrillexPackDefinition",
+        "Skrillex_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "Bangarang",
+        "Butterflies",
+        "DontGo",
+        "FirstOfTheYear",
+        "RaggaBomb",
+        "RockNRoll",
+        "ScaryMonstersAndNiceSprites",
+        "TheDevilsDen"
+      ]
+    },
+    {
+      "id": "therollingstones",
+      "path": "assets/aa/Android/therollingstones_pack_assets_all_16b417c7664ed7506fca14a20a981d17.bundle",
+      "collection": "TheRollingStonesBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "TheRollingStonesBeatmapLevelPack",
+          "_packID": "TheRollingStones",
+          "_packName": "The Rolling Stones Music Pack",
+          "_shortPackName": "The Rolling Stones",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -7668306444545676130
+          },
+          "_smallCoverImage": {
+            "m_FileID": 3,
+            "m_PathID": 7304589285568506873
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -949408982155318742
+          }
+        }
+      ],
+      "loudness": [
+        "TheRollingStones_PackDefinition",
+        "TheRollingStones_PerceivedLoudness"
+      ],
+      "stock_levels": [
+        "Angry",
+        "BiteMyHeadOff",
+        "CantYouHearMeKnocking",
+        "GimmeShelter",
+        "ICantGetNoSatisfaction",
+        "LiveByTheSword",
+        "MessItUp",
+        "PaintItBlack",
+        "StartMeUp",
+        "SympathyForTheDevil",
+        "WholeWideWorld"
+      ]
+    },
+    {
+      "id": "theweeknd",
+      "path": "assets/aa/Android/theweeknd_pack_assets_all_ff7f59fd96c338683336d70bf3dec7ab.bundle",
+      "collection": "TheWeekndBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "TheWeekndBeatmapLevelPack",
+          "_packID": "TheWeeknd",
+          "_packName": "The Weeknd Music Pack",
+          "_shortPackName": "The Weeknd",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": 486045556804443770
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": 1791144194085929201
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -6343914080980045915
+          }
+        }
+      ],
+      "loudness": [
+        "TheWeeknd_PerceivedLoudnessPerLevel",
+        "TheWeekndPackDefinition"
+      ],
+      "stock_levels": [
+        "DieForYou",
+        "LessThanZero",
+        "BlindingLights",
+        "CantFeelMyFace",
+        "HowDoIMakeYouLoveMe",
+        "IFeelItComing",
+        "PrayForMe",
+        "Sacrifice",
+        "SaveYourTears",
+        "Starboy",
+        "TakeMyBreath",
+        "TheHills"
+      ]
+    },
+    {
+      "id": "timbaland",
+      "path": "assets/aa/Android/timbaland_pack_assets_all_4f615c783efde4683dc2c5d0131e1a37.bundle",
+      "collection": "TimbalandBeatmapLevelCollection",
+      "definitions": [
+        {
+          "m_GameObject": {
+            "m_FileID": 0,
+            "m_PathID": 0
+          },
+          "m_Enabled": 1,
+          "m_Script": {
+            "m_FileID": 1,
+            "m_PathID": -5762591936902705629
+          },
+          "m_Name": "TimbalandBeatmapLevelPack",
+          "_packID": "Timbaland",
+          "_packName": "Timbaland Music Pack",
+          "_shortPackName": "Timbaland",
+          "_coverImage": {
+            "m_FileID": 0,
+            "m_PathID": -7561206844634591454
+          },
+          "_smallCoverImage": {
+            "m_FileID": 2,
+            "m_PathID": 4291168445065694991
+          },
+          "_packBuyOption": 0,
+          "_contentRating": 1,
+          "_beatmapLevelCollection": {
+            "m_FileID": 0,
+            "m_PathID": -7593268044304934253
+          }
+        }
+      ],
+      "loudness": [
+        "TimbalandPackDefinition",
+        "Timbaland_PerceivedLoudnessPerLevel"
+      ],
+      "stock_levels": [
+        "HasAMeaning",
+        "DumbThingz",
+        "WhileWereYoung",
+        "WhatILike",
+        "Famous"
+      ]
+    }
+  ]
+}

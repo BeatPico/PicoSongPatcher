@@ -24,8 +24,12 @@ def decode_text(obj):
     raw=obj.parse_as_dict()['m_Script'].encode('utf-8','surrogateescape')
     return json.loads(gzip.decompress(raw) if raw[:2]==b'\x1f\x8b' else raw)
 def clone(obj,label):
-    new=copy.copy(obj);new.path_id=int.from_bytes(hashlib.sha256(label.encode()).digest()[:8],'little')&0x7fffffffffffffff
-    require(new.path_id not in obj.assets_file.objects,'Конфликт идентификаторов. Убери повторяющуюся карту.')
+    new=copy.copy(obj);attempt=0
+    while True:
+        key=label if attempt==0 else label+'-clone-'+str(attempt)
+        new.path_id=int.from_bytes(hashlib.sha256(key.encode()).digest()[:8],'little')&0x7fffffffffffffff
+        if new.path_id not in obj.assets_file.objects:break
+        attempt+=1
     new.data=obj.get_raw_data();obj.assets_file.objects[new.path_id]=new;obj.assets_file.mark_changed();return new
 def replace_resource(bundle,name,data):
     reader=EndianBinaryReader(data);reader.flags=bundle.files[name].flags;bundle.files[name]=reader
@@ -112,22 +116,35 @@ class Menu:
     def __init__(self,raw):
         self.env=UnityPy.load(raw);self.objects=list(self.env.objects)
         self.original={o.path_id:o.get_raw_data() for o in self.objects};self.new_ids=[]
-        self.collection=self.find('OstVol1BeatmapLevelCollection');self.levels=self.collection.parse_as_dict()
-        self.loudness=self.find('OST1_PerceivedLoudnessPerLevel');self.loud=self.loudness.parse_as_dict()
+        self.collection=next(o for o in self.objects if o.type.name=='MonoBehaviour' and isinstance(o.parse_as_dict().get('_beatmapLevels'),list));self.levels=self.collection.parse_as_dict()
+        self.loudness=next(o for o in self.objects if o.type.name=='MonoBehaviour' and isinstance(o.parse_as_dict().get('_perceivedLoudnessPerLevel'),list));self.loud=self.loudness.parse_as_dict()
         self.bundle=next(o for o in self.objects if o.type.name=='AssetBundle')
+        by_id={o.path_id:o for o in self.objects}
+        candidates=[by_id[p['m_PathID']] for p in self.levels['_beatmapLevels'] if p['m_FileID']==0 and p['m_PathID'] in by_id]
+        candidates=[o for o in candidates if any(g['_beatmapCharacteristic']['m_PathID']==-7286399427822119286 for g in o.parse_as_dict().get('_previewDifficultyBeatmapSets',[]))]
+        require(candidates,'В паке отсутствует шаблон Standard для добавления песен.')
+        self.template_level=max(candidates,key=lambda o:len(o.parse_as_dict().get('_previewDifficultyBeatmapSets',[])))
+        preview=self.template_level.parse_as_dict()['_previewAudioClip']
+        require(preview['m_FileID']==0 and preview['m_PathID'] in by_id,'В паке отсутствует локальный шаблон превью.')
+        self.template_preview=by_id[preview['m_PathID']]
+        sprites=[o for o in self.objects if o.type.name=='Sprite' and o.parse_as_dict()['m_RD']['texture']['m_FileID']==0 and o.parse_as_dict()['m_RD']['texture']['m_PathID'] in by_id]
+        require(sprites,'В паке отсутствует локальный шаблон обложки.')
+        self.template_sprite=next((o for o in sprites if o.parse_as_dict()['m_Rect']['width']==1024 and o.parse_as_dict()['m_Rect']['height']==1024),sprites[0])
+        self.template_texture=by_id[self.template_sprite.parse_as_dict()['m_RD']['texture']['m_PathID']]
     def find(self,name):return next(o for o in self.objects if o.peek_name()==name)
     def add(self,parsed,level_id,fsb,frames,duration,lufs):
-        info=parsed['info'];level=clone(self.find('BeatSaberBeatmapLevel'),level_id+'-menu')
-        preview=clone(self.find('BeatSaberPreview'),level_id+'-preview')
-        sprite=clone(next(o for o in self.objects if o.type.name=='Sprite'),level_id+'-sprite')
-        texture=clone(next(o for o in self.objects if o.type.name=='Texture2D'),level_id+'-texture')
+        info=parsed['info'];level=clone(self.template_level,level_id+'-menu')
+        preview=clone(self.template_preview,level_id+'-preview')
+        sprite=clone(self.template_sprite,level_id+'-sprite')
+        texture=clone(self.template_texture,level_id+'-texture')
         self.new_ids += [o.path_id for o in [level,preview,sprite,texture]]
         t=preview.parse_as_dict();name=t['m_Resource']['m_Source'].rsplit('/',1)[-1]
         old=self.env.file.files[name].bytes;offset=(len(old)+31)//32*32
         replace_resource(self.env.file,name,old+b'\0'*(offset-len(old))+fsb)
         t.update(m_Name=level_id+'Preview',m_Length=frames/44100,m_CompressionFormat=0,m_Frequency=44100,m_Channels=2,m_BitsPerSample=16)
         t['m_Resource'].update(m_Offset=offset,m_Size=len(fsb));preview.patch(t)
-        cover=Image.open(resolve_file(parsed['folder'],info['_coverImageFilename'])).convert('RGBA').resize((1024,1024),Image.Resampling.LANCZOS)
+        with Image.open(resolve_file(parsed['folder'],info['_coverImageFilename'])) as source_cover:
+            cover=source_cover.convert('RGBA').resize((1024,1024),Image.Resampling.LANCZOS)
         tx=texture.parse_as_object();tx.m_Name=level_id+'Cover';tx.set_image(cover,target_format=4,mipmap_count=1);tx.save()
         t=sprite.parse_as_dict();t['m_Name']=level_id+'Cover';t['m_RD']['texture']=ptr(texture.path_id)
         guid=hashlib.md5((level_id+'-cover').encode()).digest()
@@ -139,8 +156,10 @@ class Menu:
                  _previewDuration=frames/44100,_previewAudioClip=ptr(preview.path_id),_coverImage=ptr(sprite.path_id),
                  _environmentName={'_environmentName':info.get('_environmentName','DefaultEnvironment')},
                  _environmentNames=[{'_environmentName':n} for n in info.get('_environmentNames',[info.get('_environmentName','DefaultEnvironment')])],_colorSchemes=[])
-        mode_ids={'Standard':-7286399427822119286,'OneSaber':-5623662769225589684,'NoArrows':-8583864861369561029}
-        templates={m:next(g for g in t['_previewDifficultyBeatmapSets'] if g['_beatmapCharacteristic']['m_PathID']==pid) for m,pid in mode_ids.items()}
+        mode_ids={'Standard':-7286399427822119286,'OneSaber':-5623662769225589684,'NoArrows':-8583864861369561029,**parsed.get('mode_ids',{})}
+        standard=next(g for g in t['_previewDifficultyBeatmapSets'] if g['_beatmapCharacteristic']['m_PathID']==mode_ids['Standard'])
+        templates={m:next((g for g in t['_previewDifficultyBeatmapSets'] if g['_beatmapCharacteristic']['m_PathID']==pid),
+                         dict(copy.deepcopy(standard),_beatmapCharacteristic={'m_FileID':standard['_beatmapCharacteristic']['m_FileID'],'m_PathID':pid})) for m,pid in mode_ids.items()}
         groups={}
         for name,config,chart,light in parsed['difficulties']:
             mode=config.get('_characteristic','Standard')
@@ -158,7 +177,7 @@ class Menu:
         self.loud['_perceivedLoudnessPerLevel'].append({'_levelId':level_id,'_perceivedLoudness':lufs,'_checkSum':''})
     def save(self):
         self.collection.patch(self.levels);self.loudness.patch(self.loud)
-        t=self.bundle.parse_as_dict();definition=next(m for p,m in t['m_Container'] if p.endswith('OstVol1_PackDefinition.asset'))
+        t=self.bundle.parse_as_dict();definition=next(m for p,m in t['m_Container'] if p.casefold().endswith('packdefinition.asset'))
         index=definition['preloadIndex']+definition['preloadSize']
         t['m_PreloadTable'][index:index]=[ptr(x) for x in self.new_ids]
         for p,m in t['m_Container']:

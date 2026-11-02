@@ -1,6 +1,7 @@
 """Isolated CPU inference. Run with the bundled Python, never system Python."""
 import os,sys,json,math,subprocess,time,traceback,wave
 from pathlib import Path
+from contextlib import nullcontext
 ROOT=Path(__file__).resolve().parent
 sys.path[:0]=[str(ROOT),str(ROOT/'infernosaber'),str(ROOT.parent)]
 os.chdir(ROOT/'infernosaber')
@@ -19,6 +20,8 @@ def run(job):
     from map_creation.v2_export import serialize_beatmap
     from full_song import windows,blank,append_window,finish
     import numpy as np
+    from gameplay_options import normalize_gameplay_options,apply_gameplay_options,filter_gameplay_objects,seeded_generation,GAMEPLAY_REVISION
+    gameplay=normalize_gameplay_options(job.get('object_options'))
     seed=int(job.get('seed',127))
     np.random.seed(seed)
     config.random_seed=seed
@@ -61,11 +64,19 @@ def run(job):
             if 'No positive tempo' not in str(error):raise
             prepared=runtime.prepare_audio(audio,120.)
             emit('В этом фрагменте нет устойчивого BPM: используется анализ акцентов.')
-        for name,nps in job['difficulties'].items():
+        for difficulty_index,(name,nps) in enumerate(job['difficulties'].items()):
             emit(f'{name}: моменты ударов, рисунок рук и направления…')
             with scoped_settings():
                 _difficulty_settings(4*float(nps))
-                result=runtime.generate(prepared,float(nps),logger=lambda message:None)
+                apply_gameplay_options(config,gameplay)
+                variant_seed=(seed+1000003*(i-1)+1009*difficulty_index)%(2**32)
+                with seeded_generation(variant_seed) if gameplay is not None else nullcontext():
+                    result=runtime.generate(prepared,float(nps),logger=lambda message:None)
+                object_report=filter_gameplay_objects(result.state,gameplay)
+                if object_report is not None:
+                    object_report['seed']=variant_seed
+                    result.diagnostics['gameplay_objects']=object_report
+                    result.diagnostics['final_counts'].update(arcs=len(result.state['arcs']),walls=len(result.state['walls']))
                 # The network conditions on the real local pulse rate; exported
                 # BPM60 makes source elapsed seconds independent of that rate.
                 chart,omissions=serialize_beatmap(result.state,60.,version='v3')
@@ -88,6 +99,7 @@ def run(job):
         'cropped_audio':False,'duration_limit':None,'difficulties':{n:len(c['colorNotes']) for n,c in charts.items()},
         'parts':reports,'stitching':finishes,'model_revision':job.get('model_revision','e0f4c8b53f4c52fc30c5b66fd7384c0ce85884ff'),
         'model_profile':profile['id'],'model_label':profile['label'],
+        'gameplay_revision':GAMEPLAY_REVISION if gameplay is not None else None,'object_options':gameplay,
         'objects_enabled':{'walls':bool(job.get('walls',False)),'bombs':bool(job.get('bombs',False))},
         'objects':{name:{'walls':len(chart['obstacles']),'bombs':len(chart['bombNotes']),
                          'arcs':len(chart['sliders'])} for name,chart in charts.items()}}
