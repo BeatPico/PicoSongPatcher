@@ -1,0 +1,73 @@
+name: Удачная генерация
+description: Песня, которую AI хорошо свёл по ритму, плотности и движениям.
+title: "[Удачная генерация]: "
+labels: ["generation:good"]
+assignees: [BeatPico]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Хорошие результаты полезны для сравнения так же, как плохие. Укажите точную запись и настройки, чтобы результат можно было воспроизвести. Полный MP3, OBB и свою библиотеку сюда не загружайте.
+  - type: input
+    id: song
+    attributes:
+      label: Песня и исполнитель
+      description: Укажите также ремикс, live-версию или другую особенность записи.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Ссылка на запись или её точная длительность
+      description: Например, официальное видео/страница трека; при наличии авторской карты — ссылка BeatSaver.
+    validations:
+      required: true
+  - type: dropdown
+    id: model
+    attributes:
+      label: AI-модель
+      options:
+        - Дообученная на 10 песнях
+        - Экспериментальная на 40 песнях
+        - Исходный InfernoSaber
+        - Другая модель или не помню
+    validations:
+      required: true
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Проверенные сложности
+      multiple: true
+      options: [Easy, Normal, Hard, Expert, ExpertPlus]
+    validations:
+      required: true
+  - type: textarea
+    id: settings
+    attributes:
+      label: Версия и настройки
+      value: |
+        Версия патчера:
+        BPM: авто / введённое число
+        Стены: вкл. / выкл.
+        Бомбы: вкл. / выкл.
+  - type: dropdown
+    id: played
+    attributes:
+      label: Как проверяли результат?
+      options:
+        - Играл в очках
+        - Только просмотр карты или видео
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Что получилось особенно хорошо?
+      description: Ритм, плотность, движения, дуги, стены или бомбы. Добавьте таймкоды, если можете.
+    validations:
+      required: true
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Пример результата
+      description: Короткое видео/скриншот или ссылка. Можно приложить ZIP с AI_analysis.json и файлом сложности без аудио. Файл анализа находится в локальной папке карты внутри data/maps; путь виден через «Подробности». Перед публикацией проверьте личные пути в файлах.

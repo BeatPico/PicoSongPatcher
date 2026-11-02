@@ -1,0 +1,48 @@
+name: Предложить доработку
+description: Генерация, движения, сложность, интерфейс, библиотека или другие функции.
+title: "[Идея]: "
+labels: [enhancement]
+assignees: [BeatPico]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Предложения по развитию программы приветствуются. Заявка будет публичной; отвечать можно прямо в этой теме.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Что улучшить?
+      options:
+        - Генерация блоков и попадание в ритм
+        - Движения, дуги, стены или бомбы
+        - Сложности и плотность
+        - Работа с кэшем и паками
+        - Библиотека и импорт песен
+        - Интерфейс и удобство
+        - Другая функция
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу вы хотите решить?
+      description: Опишите конкретную ситуацию и что сейчас неудобно или отсутствует.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Какой результат вы предлагаете?
+      description: Как это должно работать для пользователя? Можно описать шаги или пример.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Версия патчера и игры
+      placeholder: Pico Song Patcher 1.4.1; Beat Saber 1.40.8 / OVRport 3.2.2
+  - type: textarea
+    id: examples
+    attributes:
+      label: Примеры, ссылки или изображения
+      description: Если идея относится к генерации, полезны название песни, ссылка и нужный момент. Игровой кэш и полную музыку прикладывать не нужно.

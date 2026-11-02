@@ -1,0 +1,73 @@
+name: Неудачная генерация
+description: Мало или много блоков, плохой ритм, неудобные движения и проблемы объектов.
+title: "[Неудачная генерация]: "
+labels: ["generation:bad"]
+assignees: [BeatPico]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Опишите конкретный результат, который стоит улучшить. Для повторной проверки нужны точная запись и настройки. Полный MP3, OBB и свою библиотеку сюда не загружайте.
+  - type: input
+    id: song
+    attributes:
+      label: Песня и исполнитель
+      description: Укажите также ремикс, live-версию или другую особенность записи.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Ссылка на запись или её точная длительность
+      description: Например, официальное видео/страница трека; при наличии авторской карты — ссылка BeatSaver.
+    validations:
+      required: true
+  - type: dropdown
+    id: model
+    attributes:
+      label: AI-модель
+      options:
+        - Дообученная на 10 песнях
+        - Экспериментальная на 40 песнях
+        - Исходный InfernoSaber
+        - Другая модель или не помню
+    validations:
+      required: true
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Проблемные сложности
+      multiple: true
+      options: [Easy, Normal, Hard, Expert, ExpertPlus]
+    validations:
+      required: true
+  - type: textarea
+    id: settings
+    attributes:
+      label: Версия и настройки
+      value: |
+        Версия патчера:
+        BPM: авто / введённое число
+        Стены: вкл. / выкл.
+        Бомбы: вкл. / выкл.
+  - type: dropdown
+    id: played
+    attributes:
+      label: Как проверяли результат?
+      options:
+        - Играл в очках
+        - Только просмотр карты или видео
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Что плохо и как должно быть?
+      description: Например, редкие блоки в ровном ритме, перегруженная Easy, высокие дуги, неудобные стены. Укажите таймкоды проблемных мест.
+    validations:
+      required: true
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Пример результата
+      description: Короткое видео/скриншот или ссылка. Можно приложить ZIP с AI_analysis.json и файлом сложности без аудио. Файл анализа находится в локальной папке карты внутри data/maps; путь виден через «Подробности». Перед публикацией проверьте личные пути в файлах.
