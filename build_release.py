@@ -40,7 +40,7 @@ def build_executable():
         shutil.copy2(ROOT / 'assets' / name, clean / name)
     PyInstaller.__main__.run([
         str(ROOT / 'app_v14.py'), '--noconfirm', '--windowed', '--onedir',
-        '--name', NAME, '--distpath', str(WORK / 'dist'), '--workpath', str(WORK / 'pyinstaller'),
+        '--name', NAME, '--distpath', str(WORK / 'compiled'), '--workpath', str(WORK / 'pyinstaller'),
         '--specpath', str(WORK), '--contents-directory', '_internal',
         '--paths', str(LAB / 'python_packages'), '--paths', str(ROOT),
         '--collect-all', 'UnityPy', '--collect-all', 'PIL', '--collect-all', 'archspec',
@@ -49,6 +49,10 @@ def build_executable():
         '--hidden-import', 'native_audio', '--runtime-hook', str(ROOT / 'hooks/portable_audio.py'),
         '--add-data', str(clean) + ';assets',
     ])
+    compiled=WORK/'compiled'/NAME
+    TARGET.mkdir(parents=True,exist_ok=True)
+    shutil.copytree(compiled/'_internal',TARGET/'_internal',dirs_exist_ok=True)
+    shutil.copy2(compiled/(NAME+'.exe'),TARGET/(NAME+'.exe'))
 
 
 def copy_ai():
@@ -115,10 +119,12 @@ def finish():
     (data / 'library.json').write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding='utf-8')
     for name in ('README_1.4.md', 'TRAINING_RESULTS_40.md', 'THIRD_PARTY.md'):
         shutil.copy2(ROOT / name, TARGET / name)
+    shutil.copy2(ROOT/'docs/USER_GUIDE_RU.html',TARGET/'ИНСТРУКЦИЯ.html')
     (TARGET / 'НАЧАТЬ_ЗДЕСЬ.txt').write_text(
         'Pico Song Patcher 1.4.1 — Windows x64, portable\n\n'
         '1. Распакуй ВЕСЬ архив в отдельную доступную для записи папку. Не запускай EXE внутри ZIP. Python устанавливать не нужно.\n'
-        '2. Запусти ' + NAME + '.exe. Папки _internal и ai_engine должны оставаться рядом.\n'
+        '2. Открой ИНСТРУКЦИЯ.html или нажми «Инструкция» в программе: там выгрузка кэша, все кнопки и примеры шагов.\n'
+        '   Запусти ' + NAME + '.exe. Папки _internal и ai_engine должны оставаться рядом.\n'
         '3. Выгрузи из очков свой совместимый кэш Beat Saber 1.40.8 / OVRport 3.2.2. Положи OBB и espresso рядом, выбери OBB в программе.\n'
         '4. Добавляй карты или MP3 и собирай новый кэш. Исходные файлы и устройство программа не перезаписывает.\n'
         '5. При первой обработке аудио программа загрузит FFmpeg с официального репозитория BtbN/FFmpeg-Builds (около 80 МБ), проверив SHA256. Для этого нужен интернет. Далее обработка локальная.\n'
@@ -127,7 +133,7 @@ def finish():
         'Обучающие записи и массивы не включены: для собственного дообучения нужно подготовить эталоны по исходникам проекта.\n'
         'Извлечение аудио из готовых карт поддерживает PCM16-кэш патчера; для других сжатых FSB используй исходный MP3/ZIP. Переиспользование готовых карт декодирования не требует.\n\n'
         'Проект и сообщения об ошибках: https://github.com/BeatPico/PicoSongPatcher\n', encoding='utf-8')
-    files = [path for path in TARGET.rglob('*') if path.is_file()]
+    files = [path for path in TARGET.rglob('*') if path.is_file() and path.name != 'PAYLOAD.json']
     forbidden = [str(path.relative_to(TARGET)) for path in files if path.suffix.lower() in ('.obb', '.apk', '.mp3', '.ogg', '.wav', '.flac') or path.name in ('original_espresso', 'gameplay_template.bundle', 'fmod.dll', 'training_project.txt', 'library_snapshot.json')]
     if forbidden:
         raise ValueError('Private/game payload in public build: ' + str(forbidden))

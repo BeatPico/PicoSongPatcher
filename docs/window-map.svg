@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="460" viewBox="0 0 1080 460" role="img" aria-labelledby="title desc">
+<title id="title">Схема главного окна Pico Song Patcher</title><desc id="desc">Шесть областей: выбор кэша, добавление песен, модель и объекты, пак, библиотека, сборка и справка.</desc>
+<rect width="1080" height="460" rx="18" fill="#eef2f8"/><g font-family="Segoe UI,Arial,sans-serif" font-size="14" fill="#24324b">
+<text x="30" y="36" font-size="23" font-weight="700">Pico Song Patcher · схема окна</text>
+<g fill="white" stroke="#d5ddea"><rect x="64" y="57" width="988" height="50" rx="8"/><rect x="64" y="119" width="988" height="43" rx="8"/><rect x="64" y="174" width="988" height="43" rx="8"/><rect x="64" y="229" width="988" height="43" rx="8"/><rect x="64" y="284" width="988" height="87" rx="8"/><rect x="64" y="383" width="988" height="49" rx="8"/></g>
+<g fill="#6852d6"><circle cx="32" cy="82" r="17"/><circle cx="32" cy="140" r="17"/><circle cx="32" cy="195" r="17"/><circle cx="32" cy="250" r="17"/><circle cx="32" cy="327" r="17"/><circle cx="32" cy="407" r="17"/></g>
+<g fill="white" text-anchor="middle" font-weight="700"><text x="32" y="87">1</text><text x="32" y="145">2</text><text x="32" y="200">3</text><text x="32" y="255">4</text><text x="32" y="332">5</text><text x="32" y="412">6</text></g>
+<text x="81" y="88">Путь к OBB на ПК</text><text x="610" y="88">Выбрать OBB…</text><text x="790" y="88">Прочитать</text><text x="920" y="88">Песни внутри</text>
+<text x="81" y="146">Добавить папку…</text><text x="265" y="146">Добавить ZIP…</text><text x="435" y="146">Из MP3 (AI)…</text><text x="595" y="146">Пересоздать AI</text><text x="775" y="146">Вкл. / выкл.</text><text x="907" y="146">Удалить…</text>
+<text x="81" y="201">AI-модель</text><text x="287" y="201">Обучить модель на эталонах</text><text x="563" y="201">Сравнение моделей</text><text x="810" y="201">☑ Стены</text><text x="930" y="201">☑ Бомбы</text>
+<text x="81" y="256">Пак для новых песен</text><text x="420" y="256">Назначить выбранным</text><text x="771" y="256">Удалить локальные вне OBB…</text>
+<text x="81" y="310" font-weight="600">В сборку · В этом OBB · Песня · Исполнитель · Пак · Версия AI · Сложности</text><path d="M80 320h956" stroke="#d5ddea"/><text x="81" y="346" fill="#64748b">Строки библиотеки: клик / протягивание мыши / Ctrl / Shift</text>
+<text x="81" y="413" font-weight="700" fill="#176b5b">Собрать кэш</text><text x="243" y="413">Открыть готовые файлы</text><text x="504" y="413">Подробности</text><text x="682" y="413">Состав новой сборки</text><text x="936" y="413">Инструкция</text>
+</g></svg>

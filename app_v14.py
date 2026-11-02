@@ -169,6 +169,8 @@ class Window:
         self.open_button.pack(side='left', padx=7)
         self.button(actions, 'Подробности', self.show_selected).pack(side='left')
         self.button(actions, 'Состав новой сборки', self.show_next_build).pack(side='left', padx=7)
+        self.guide_button = self.button(actions, 'Инструкция', self.open_guide)
+        self.guide_button.pack(side='right')
         self.open_button.configure(state='normal' if self.last_output else 'disabled')
         self.progress = ttk.Progressbar(frame, mode='indeterminate')
         self.progress.grid(row=12, column=0, sticky='ew', pady=(9, 7))
@@ -879,6 +881,14 @@ class Window:
         if self.last_output and self.last_output.is_dir():
             os.startfile(self.last_output)
 
+    def open_guide(self):
+        path = next((candidate for candidate in (HOME / 'ИНСТРУКЦИЯ.html', SOURCE / 'docs/USER_GUIDE_RU.html')
+                     if candidate.is_file()), None)
+        if path:
+            os.startfile(path)
+        else:
+            messagebox.showinfo('Инструкция', 'Полная инструкция: https://github.com/BeatPico/PicoSongPatcher/blob/main/docs/USER_GUIDE_RU.md', parent=self.root)
+
     def close(self):
         if self.busy:
             messagebox.showinfo('Идёт обработка', 'Дождись окончания обработки. Окно можно свернуть.', parent=self.root)
@@ -927,6 +937,8 @@ def main():
                  'requested_height': root.winfo_reqheight(),
                  'bottom_widget_y': window.footer.winfo_rooty() + window.footer.winfo_height() - root.winfo_rooty(),
                  'build_button_visible': bool(window.build_button.winfo_ismapped())}
+        check['guide_button_visible'] = bool(window.guide_button.winfo_ismapped())
+        check['offline_guide'] = (HOME / 'ИНСТРУКЦИЯ.html').is_file()
         (HOME / 'self_test.json').write_text(json.dumps(check, ensure_ascii=False, indent=2), encoding='utf-8')
         window.close()
         return

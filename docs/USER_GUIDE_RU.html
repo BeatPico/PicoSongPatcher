@@ -1,0 +1,309 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pico Song Patcher — инструкция к EXE</title><style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#eef2f8;color:#24324b;font:16px/1.65 "Segoe UI",Arial,sans-serif}main{max-width:1120px;margin:36px auto;padding:42px 56px;background:white;border-radius:20px;box-shadow:0 12px 40px #24324b0d}h1{font-size:34px;line-height:1.25;color:#18223d;margin-top:0}h2{margin-top:45px;padding-top:16px;border-top:1px solid #dfe5ef;color:#463d97;font-size:25px}h3{font-size:20px;color:#463d97}a{color:#5145bc;text-underline-offset:3px}a:hover{color:#176b5b}strong{color:#172744}li{margin:.55em 0}code{font-family:Consolas,monospace;font-size:.9em;background:#f1f4fa;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{overflow-x:auto;padding:20px 24px;background:#111c35;color:#e4ecff;border-radius:12px;line-height:1.55}pre code{background:none;padding:0;color:inherit;overflow-wrap:normal}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}td,th{border:1px solid #dce3ee;text-align:left;vertical-align:top;padding:12px 15px}th{background:#edf0fb;color:#3b3486}tbody tr:nth-child(even){background:#f8fafc}td:first-child{width:29%}img{max-width:100%;height:auto;border-radius:12px}footer{margin-top:40px;color:#64748b;font-size:14px}@media(max-width:740px){main{margin:0;border-radius:0;padding:26px 20px}h1{font-size:27px}h2{font-size:22px}table{font-size:13px}td,th{padding:8px}pre{font-size:12px;padding:14px}}@media print{body{background:white}main{box-shadow:none;margin:0;padding:0;max-width:none}h2{break-after:avoid}tr{break-inside:avoid}a{color:inherit}pre{white-space:pre-wrap;background:#f5f5f5;color:black}}
+</style></head><body><main><h1>Pico Song Patcher 1.4.1: инструкция к EXE</h1>
+<p>Программа для Windows x64 добавляет готовые карты и создаёт AI-карты из музыки для <strong>Beat Saber 1.40.8 / OVRport 3.2.2 на Pico 4</strong>. Она работает с локальной копией кэша. Установленная совместимая игра и собственные игровые файлы нужны отдельно.</p>
+<p><strong>Первый запуск:</strong> скачать ZIP → распаковать целиком → скопировать OBB и espresso с очков → выбрать OBB → добавить песни → собрать кэш → вручную перенести результат на очки.</p>
+<p><a href="#download">Скачать и запустить</a> · <a href="#cache">Выгрузить кэш</a> · <a href="#buttons">Кнопки</a> · <a href="#maps">Готовые карты</a> · <a href="#ai">Музыка и AI</a> · <a href="#install">Собрать и перенести</a> · <a href="#update">Обновить кэш</a> · <a href="#delete">Удалить песни</a> · <a href="#errors">Ошибки</a></p>
+<p><a id="download"></a></p>
+<h2>1. Скачать и запустить</h2>
+<ol>
+<li>Откройте <a href="https://github.com/BeatPico/PicoSongPatcher/releases/latest">последний выпуск на GitHub</a>.</li>
+<li>В <strong>Assets</strong> скачайте <strong>PicoSongPatcher-1.4.1-Windows-x64.zip</strong>. Автоматические ссылки <strong>Source code</strong> предназначены для исходников.</li>
+<li>В Проводнике выберите <strong>Извлечь всё</strong>. Распакуйте весь архив в отдельную доступную для записи папку, например <code>D:\PicoSongPatcher</code>.</li>
+<li>Откройте распакованную папку и запустите <strong>PicoSongPatcher-1.4.1-Windows-x64.exe</strong>. Не запускайте его внутри ZIP и не переносите отдельно от папок <code>_internal</code> и <code>ai_engine</code>.</li>
+<li>Рядом лежит <strong>ИНСТРУКЦИЯ.html</strong>. Её также открывает кнопка <strong>Инструкция</strong> в программе; для чтения интернет не нужен.</li>
+</ol>
+<p>Python устанавливать не требуется. В комплекте пустая библиотека, отдельное CPU AI-окружение и три модели. Для первой обработки аудио нужен интернет: FFmpeg загрузится из <a href="https://github.com/BtbN/FFmpeg-Builds">BtbN/FFmpeg-Builds</a> с проверкой размера и SHA256. Далее обработка локальная.</p>
+<p>Оставьте свободное место для исходного кэша, нового OBB и временных файлов. С добавлением песен итоговый OBB может заметно вырасти.</p>
+<p><a id="cache"></a></p>
+<h2>2. Где взять кэш с Pico</h2>
+<p>Для поддерживаемого порта кэш — это <strong>два файла</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Файл</th>
+<th>Как распознать</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>main.1716.com.beatgames.beatsaber.obb</code></td>
+<td>Большой файл с расширением <code>.obb</code></td>
+</tr>
+<tr>
+<td><code>espresso</code></td>
+<td>Файл без расширения, лежащий рядом с OBB</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>Полностью закройте Beat Saber на очках.</li>
+<li>Подключите включённые очки к ПК USB-кабелем, который поддерживает передачу данных.</li>
+<li>Наденьте очки и подтвердите доступ к файлам, если появится запрос. Для USB должен быть выбран режим <strong>Передача файлов / File Transfer</strong>, а не только зарядка. Название и положение настройки зависят от Pico OS; в некоторых версиях она находится в разделе <strong>Разработчик → USB-подключение</strong>. <a href="https://developer.picoxr.com/document/unreal/pdc-faq/">Официальная справка PICO о режиме File Transfer</a>.</li>
+<li>В Проводнике Windows откройте:</li>
+</ol>
+<pre><code class="language-text">Этот компьютер
+└─ PICO 4
+   └─ Внутренний общий накопитель / Internal shared storage
+      └─ Android
+         └─ obb
+            └─ com.beatgames.beatsaber
+               ├─ main.1716.com.beatgames.beatsaber.obb
+               └─ espresso
+</code></pre>
+<ol start="5">
+<li><strong>Скопируйте оба файла на ПК</strong>, например в <code>D:\PicoCache\С_очков</code>. Работайте с этой копией. Дождитесь полного окончания копирования.</li>
+<li>Сохраните ещё одну резервную копию этих двух файлов в отдельной папке, например <code>D:\PicoCache\Резервная_копия</code>.</li>
+</ol>
+<p>Подходит кэш, в который уже добавляли песни: брать чистый оригинал каждый раз не требуется. OBB и espresso должны относиться к одной рабочей версии кэша.</p>
+<p><strong>Если папок или файлов нет:</strong> проверьте режим передачи файлов, USB-кабель, разрешение доступа в очках и версию установленной игры. Не создавайте случайные папки вместо отсутствующих и не переименовывайте OBB от другой игры. Патчер сам файлы с устройства не выгружает. Доступность <code>Android/obb</code> через USB зависит также от системы очков.</p>
+<p>Файл <code>espresso</code> нужен для подготовки совместимых игровых шаблонов и итоговой пары файлов. В публичном ZIP игровых ресурсов нет. Чтение списка песен может работать и без espresso, но для сборки положите его рядом с выбранным OBB.</p>
+<p><a id="open"></a></p>
+<h2>3. Открыть кэш и посмотреть песни</h2>
+<ol>
+<li>Нажмите <strong>Выбрать OBB…</strong> и укажите OBB <strong>на ПК</strong>, например <code>D:\PicoCache\С_очков\main.1716.com.beatgames.beatsaber.obb</code>.</li>
+<li>Дождитесь чтения. Добавленные песни появятся в основной таблице и по умолчанию будут отмечены в столбце <strong>В сборку</strong>.</li>
+<li>Нажмите <strong>Песни внутри</strong>, чтобы посмотреть все распознанные паки, штатные и добавленные песни.</li>
+<li>Если путь введён или изменён вручную, нажмите <strong>Прочитать</strong>.</li>
+</ol>
+<p>Основная таблица — библиотека добавленных карт. Штатные OST не дублируются в ней; они видны через <strong>Песни внутри</strong>. Песни без исходных ZIP могут получить локальную копию готовых игровых данных и переиспользоваться при следующей сборке.</p>
+<p><a id="buttons"></a></p>
+<h2>4. Что где находится и какие кнопки нажимать</h2>
+<p><img alt="Схема главного окна" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjQ2MCIgdmlld0JveD0iMCAwIDEwODAgNDYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPtCh0YXQtdC80LAg0LPQu9Cw0LLQvdC+0LPQviDQvtC60L3QsCBQaWNvIFNvbmcgUGF0Y2hlcjwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPtCo0LXRgdGC0Ywg0L7QsdC70LDRgdGC0LXQuTog0LLRi9Cx0L7RgCDQutGN0YjQsCwg0LTQvtCx0LDQstC70LXQvdC40LUg0L/QtdGB0LXQvSwg0LzQvtC00LXQu9GMINC4INC+0LHRitC10LrRgtGLLCDQv9Cw0LosINCx0LjQsdC70LjQvtGC0LXQutCwLCDRgdCx0L7RgNC60LAg0Lgg0YHQv9GA0LDQstC60LAuPC9kZXNjPgo8cmVjdCB3aWR0aD0iMTA4MCIgaGVpZ2h0PSI0NjAiIHJ4PSIxOCIgZmlsbD0iI2VlZjJmOCIvPjxnIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSxBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMjQzMjRiIj4KPHRleHQgeD0iMzAiIHk9IjM2IiBmb250LXNpemU9IjIzIiBmb250LXdlaWdodD0iNzAwIj5QaWNvIFNvbmcgUGF0Y2hlciDCtyDRgdGF0LXQvNCwINC+0LrQvdCwPC90ZXh0Pgo8ZyBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjZDVkZGVhIj48cmVjdCB4PSI2NCIgeT0iNTciIHdpZHRoPSI5ODgiIGhlaWdodD0iNTAiIHJ4PSI4Ii8+PHJlY3QgeD0iNjQiIHk9IjExOSIgd2lkdGg9Ijk4OCIgaGVpZ2h0PSI0MyIgcng9IjgiLz48cmVjdCB4PSI2NCIgeT0iMTc0IiB3aWR0aD0iOTg4IiBoZWlnaHQ9IjQzIiByeD0iOCIvPjxyZWN0IHg9IjY0IiB5PSIyMjkiIHdpZHRoPSI5ODgiIGhlaWdodD0iNDMiIHJ4PSI4Ii8+PHJlY3QgeD0iNjQiIHk9IjI4NCIgd2lkdGg9Ijk4OCIgaGVpZ2h0PSI4NyIgcng9IjgiLz48cmVjdCB4PSI2NCIgeT0iMzgzIiB3aWR0aD0iOTg4IiBoZWlnaHQ9IjQ5IiByeD0iOCIvPjwvZz4KPGcgZmlsbD0iIzY4NTJkNiI+PGNpcmNsZSBjeD0iMzIiIGN5PSI4MiIgcj0iMTciLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjE0MCIgcj0iMTciLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjE5NSIgcj0iMTciLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjI1MCIgcj0iMTciLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyNyIgcj0iMTciLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjQwNyIgcj0iMTciLz48L2c+CjxnIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNzAwIj48dGV4dCB4PSIzMiIgeT0iODciPjE8L3RleHQ+PHRleHQgeD0iMzIiIHk9IjE0NSI+MjwvdGV4dD48dGV4dCB4PSIzMiIgeT0iMjAwIj4zPC90ZXh0Pjx0ZXh0IHg9IjMyIiB5PSIyNTUiPjQ8L3RleHQ+PHRleHQgeD0iMzIiIHk9IjMzMiI+NTwvdGV4dD48dGV4dCB4PSIzMiIgeT0iNDEyIj42PC90ZXh0PjwvZz4KPHRleHQgeD0iODEiIHk9Ijg4Ij7Qn9GD0YLRjCDQuiBPQkIg0L3QsCDQn9CaPC90ZXh0Pjx0ZXh0IHg9IjYxMCIgeT0iODgiPtCS0YvQsdGA0LDRgtGMIE9CQuKApjwvdGV4dD48dGV4dCB4PSI3OTAiIHk9Ijg4Ij7Qn9GA0L7Rh9C40YLQsNGC0Yw8L3RleHQ+PHRleHQgeD0iOTIwIiB5PSI4OCI+0J/QtdGB0L3QuCDQstC90YPRgtGA0Lg8L3RleHQ+Cjx0ZXh0IHg9IjgxIiB5PSIxNDYiPtCU0L7QsdCw0LLQuNGC0Ywg0L/QsNC/0LrRg+KApjwvdGV4dD48dGV4dCB4PSIyNjUiIHk9IjE0NiI+0JTQvtCx0LDQstC40YLRjCBaSVDigKY8L3RleHQ+PHRleHQgeD0iNDM1IiB5PSIxNDYiPtCY0LcgTVAzIChBSSnigKY8L3RleHQ+PHRleHQgeD0iNTk1IiB5PSIxNDYiPtCf0LXRgNC10YHQvtC30LTQsNGC0YwgQUk8L3RleHQ+PHRleHQgeD0iNzc1IiB5PSIxNDYiPtCS0LrQuy4gLyDQstGL0LrQuy48L3RleHQ+PHRleHQgeD0iOTA3IiB5PSIxNDYiPtCj0LTQsNC70LjRgtGM4oCmPC90ZXh0Pgo8dGV4dCB4PSI4MSIgeT0iMjAxIj5BSS3QvNC+0LTQtdC70Yw8L3RleHQ+PHRleHQgeD0iMjg3IiB5PSIyMDEiPtCe0LHRg9GH0LjRgtGMINC80L7QtNC10LvRjCDQvdCwINGN0YLQsNC70L7QvdCw0YU8L3RleHQ+PHRleHQgeD0iNTYzIiB5PSIyMDEiPtCh0YDQsNCy0L3QtdC90LjQtSDQvNC+0LTQtdC70LXQuTwvdGV4dD48dGV4dCB4PSI4MTAiIHk9IjIwMSI+4piRINCh0YLQtdC90Ys8L3RleHQ+PHRleHQgeD0iOTMwIiB5PSIyMDEiPuKYkSDQkdC+0LzQsdGLPC90ZXh0Pgo8dGV4dCB4PSI4MSIgeT0iMjU2Ij7Qn9Cw0Log0LTQu9GPINC90L7QstGL0YUg0L/QtdGB0LXQvTwvdGV4dD48dGV4dCB4PSI0MjAiIHk9IjI1NiI+0J3QsNC30L3QsNGH0LjRgtGMINCy0YvQsdGA0LDQvdC90YvQvDwvdGV4dD48dGV4dCB4PSI3NzEiIHk9IjI1NiI+0KPQtNCw0LvQuNGC0Ywg0LvQvtC60LDQu9GM0L3Ri9C1INCy0L3QtSBPQkLigKY8L3RleHQ+Cjx0ZXh0IHg9IjgxIiB5PSIzMTAiIGZvbnQtd2VpZ2h0PSI2MDAiPtCSINGB0LHQvtGA0LrRgyDCtyDQkiDRjdGC0L7QvCBPQkIgwrcg0J/QtdGB0L3RjyDCtyDQmNGB0L/QvtC70L3QuNGC0LXQu9GMIMK3INCf0LDQuiDCtyDQktC10YDRgdC40Y8gQUkgwrcg0KHQu9C+0LbQvdC+0YHRgtC4PC90ZXh0PjxwYXRoIGQ9Ik04MCAzMjBoOTU2IiBzdHJva2U9IiNkNWRkZWEiLz48dGV4dCB4PSI4MSIgeT0iMzQ2IiBmaWxsPSIjNjQ3NDhiIj7QodGC0YDQvtC60Lgg0LHQuNCx0LvQuNC+0YLQtdC60Lg6INC60LvQuNC6IC8g0L/RgNC+0YLRj9Cz0LjQstCw0L3QuNC1INC80YvRiNC4IC8gQ3RybCAvIFNoaWZ0PC90ZXh0Pgo8dGV4dCB4PSI4MSIgeT0iNDEzIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMTc2YjViIj7QodC+0LHRgNCw0YLRjCDQutGN0Yg8L3RleHQ+PHRleHQgeD0iMjQzIiB5PSI0MTMiPtCe0YLQutGA0YvRgtGMINCz0L7RgtC+0LLRi9C1INGE0LDQudC70Ys8L3RleHQ+PHRleHQgeD0iNTA0IiB5PSI0MTMiPtCf0L7QtNGA0L7QsdC90L7RgdGC0Lg8L3RleHQ+PHRleHQgeD0iNjgyIiB5PSI0MTMiPtCh0L7RgdGC0LDQsiDQvdC+0LLQvtC5INGB0LHQvtGA0LrQuDwvdGV4dD48dGV4dCB4PSI5MzYiIHk9IjQxMyI+0JjQvdGB0YLRgNGD0LrRhtC40Y88L3RleHQ+CjwvZz48L3N2Zz4K" /></p>
+<p>Это схема групп элементов. Названия ниже соответствуют кнопкам версии 1.4.1.</p>
+<table>
+<thead>
+<tr>
+<th>Область / кнопка</th>
+<th>Действие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1 · Выбрать OBB…</strong></td>
+<td>Выбрать локальную копию исходного или уже изменённого кэша.</td>
+</tr>
+<tr>
+<td><strong>Прочитать</strong></td>
+<td>Заново прочитать файл из верхней строки. Содержащиеся в нём кастомные карты снова отмечаются для сборки.</td>
+</tr>
+<tr>
+<td><strong>Песни внутри</strong></td>
+<td>Просмотреть все распознанные паки и песни выбранного OBB; список можно сохранить из окна просмотра.</td>
+</tr>
+<tr>
+<td><strong>2 · Добавить ZIP…</strong></td>
+<td>Импортировать скачанные готовые карты. Можно выбрать несколько архивов.</td>
+</tr>
+<tr>
+<td><strong>Добавить папку…</strong></td>
+<td>Импортировать распакованную карту с Info.dat и её файлами.</td>
+</tr>
+<tr>
+<td><strong>Из MP3 (AI)…</strong></td>
+<td>Создать Easy, Normal и Hard для всей выбранной музыки. Принимает также поддерживаемые WAV, FLAC, M4A, OGG, AAC, WMA и OPUS.</td>
+</tr>
+<tr>
+<td><strong>Пересоздать AI</strong></td>
+<td>Создать новые AI-карты из аудио выделенных песен с текущей моделью и настройками объектов.</td>
+</tr>
+<tr>
+<td><strong>Вкл. / выкл.</strong></td>
+<td>Изменить отметку <strong>В сборку</strong> у выделенных строк.</td>
+</tr>
+<tr>
+<td><strong>Удалить выбранные…</strong></td>
+<td>Показать список и после подтверждения удалить выбранные записи и принадлежащие им локальные файлы.</td>
+</tr>
+<tr>
+<td><strong>3 · AI-модель</strong></td>
+<td>Выбрать модель для последующей генерации и пересоздания карт.</td>
+</tr>
+<tr>
+<td><strong>Стены / Бомбы</strong></td>
+<td>Включить эти объекты в новых и пересозданных AI-картах. Уже сохранённые карты от переключения галочек не меняются.</td>
+</tr>
+<tr>
+<td><strong>Сравнение моделей</strong></td>
+<td>Открыть доступный отчёт выбранной дообученной модели.</td>
+</tr>
+<tr>
+<td><strong>Обучить модель на эталонах</strong></td>
+<td>Запустить дообучение по заранее подготовленной подборке. Для обычного добавления песен эта кнопка не нужна.</td>
+</tr>
+<tr>
+<td><strong>4 · Пак для новых песен</strong></td>
+<td>Выбрать существующий пак игры для новых импортов.</td>
+</tr>
+<tr>
+<td><strong>Назначить выбранным</strong></td>
+<td>Применить выбранный пак к выделенным строкам, в том числе перенести ранее встроенные песни в другой пак следующей сборки.</td>
+</tr>
+<tr>
+<td><strong>Удалить локальные вне OBB…</strong></td>
+<td>Предложить удалить записи, точных ID которых нет в выбранном кэше. Сравнение идёт с файлом на ПК.</td>
+</tr>
+<tr>
+<td><strong>Упрощать карты с модами…</strong></td>
+<td>Разрешить импорт совместимой упрощённой версии некоторых карт, убрав требования эффектов и особых правил. Результат может отличаться от авторского; не все карты удастся упростить.</td>
+</tr>
+<tr>
+<td><strong>5 · Таблица</strong></td>
+<td>Выделяйте строку кликом, диапазон протягиванием мыши или Shift, отдельные строки с Ctrl. Столбец <strong>В сборку</strong> отвечает за включение песни, выделение строки — за действия над ней.</td>
+</tr>
+<tr>
+<td><strong>В этом OBB</strong></td>
+<td>Показывает, найден ли точный ID этой версии карты в открытом кэше.</td>
+</tr>
+<tr>
+<td><strong>6 · Собрать кэш</strong></td>
+<td>Создать и проверить новую локальную сборку.</td>
+</tr>
+<tr>
+<td><strong>Открыть готовые файлы</strong></td>
+<td>Открыть папку результата после успешной сборки.</td>
+</tr>
+<tr>
+<td><strong>Подробности</strong></td>
+<td>Показать ID, сложности, путь и замечания выделенных карт.</td>
+</tr>
+<tr>
+<td><strong>Состав новой сборки</strong></td>
+<td>Проверить, какие добавленные песни включены и в какие паки они попадут.</td>
+</tr>
+<tr>
+<td><strong>Инструкция</strong></td>
+<td>Открыть эту справку без интернета.</td>
+</tr>
+</tbody>
+</table>
+<p><a id="maps"></a></p>
+<h2>5. Добавить готовую авторскую карту</h2>
+<ol>
+<li>Скачайте ZIP карты с <a href="https://beatsaver.com/">BeatSaver</a>. Авторы уже расставили в ней блоки и движения.</li>
+<li>Откройте свой OBB в патчере и выберите <strong>Пак для новых песен</strong>.</li>
+<li>Нажмите <strong>Добавить ZIP…</strong> и выберите архив. Распаковывать его заранее не обязательно. Для распакованного варианта используйте <strong>Добавить папку…</strong> и папку с <code>Info.dat</code>.</li>
+<li>Дождитесь импорта. Проверьте, какие сложности появились, и прочитайте замечания, если они есть.</li>
+<li>Убедитесь, что песня отмечена <strong>В сборку</strong>.</li>
+</ol>
+<p>Для такого импорта нейросеть и кнопка дообучения не нужны. Некоторые карты требуют игровых модов, которые патчер не устанавливает. Ошибка конкретной сложности не означает, что обработаны все остальные: проверяйте список сложностей после импорта.</p>
+<p><a id="ai"></a></p>
+<h2>6. Сделать карту из обычной музыки</h2>
+<ol>
+<li>В поле <strong>AI-модель</strong> оставьте <strong>Дообученная · 10 песен</strong> для первого теста. Модель на 40 песнях доступна как экспериментальная; больше примеров пока не дали улучшения всех итоговых метрик.</li>
+<li>Выберите пак назначения, включите <strong>Стены</strong> и <strong>Бомбы</strong>, если хотите эти объекты.</li>
+<li>Нажмите <strong>Из MP3 (AI)…</strong> и выберите одну или несколько аудиозаписей.</li>
+<li>В окне BPM оставьте <strong>Авто</strong>, если темп неизвестен. Число от 40 до 320 применяется ко всем выбранным файлам, поэтому разные известные BPM задавайте отдельными запусками.</li>
+<li>Дождитесь завершения по журналу внизу окна. Обрабатывается полная запись; для длинных песен AI использует части с контекстом.</li>
+<li>В библиотеке появятся AI-карты со сложностями <strong>Easy, Normal, Hard</strong>. Затем соберите кэш.</li>
+</ol>
+<p>Стены создаются для боковых уклонов и пригибаний в подходящих местах. Количество стен, бомб и дуг зависит от песни и сложности. Галочки не гарантируют одинакового числа объектов в каждом треке.</p>
+<h3>Изменить уже созданную AI-карту</h3>
+<p>Выделите песни → выберите модель и галочки объектов → <strong>Пересоздать AI</strong> → дождитесь окончания → <strong>Состав новой сборки</strong> → <strong>Собрать кэш</strong>. Для новых настроек нужна новая генерация; простое переключение галочки не переделывает старые карты.</p>
+<p>Пересоздание использует аудио, а не авторскую расстановку блоков. Для карты из сжатого FSB, который публичная сборка не декодирует, понадобится исходный MP3/ZIP. Если готовая карта уже есть в кэше и её менять не нужно, её можно сохранить без извлечения аудио.</p>
+<h3>Кнопка обучения</h3>
+<p><strong>Обучить модель на эталонах</strong> предназначена для отдельного подготовленного набора. Она не берёт выделенные библиотечные песни в качестве примеров автоматически. Обучающие записи и подготовленные массивы в публичный ZIP не входят. Простому пользователю для добавления песен обучать модель заново не требуется.</p>
+<p><a id="packs"></a></p>
+<h2>7. Куда попадут песни в игре</h2>
+<p>Для новых песен заранее выберите <strong>Пак для новых песен</strong>. Чтобы поменять пак у уже добавленных строк: выделите их, выберите пак и нажмите <strong>Назначить выбранным</strong>.</p>
+<p>Ранее встроенные песни сохраняют свои паки, пока вы явно не назначите другой. Используются существующие паки, распознанные в выбранном OBB. Папка в Проводнике не создаёт новый раздел меню игры.</p>
+<p>Перед сборкой нажмите <strong>Состав новой сборки</strong>. После сборки соответствие песен пакам есть в <code>ПЕСНИ_В_КЭШЕ.txt</code> в папке результата.</p>
+<p><a id="install"></a></p>
+<h2>8. Собрать кэш и перенести на очки</h2>
+<ol>
+<li>Проверьте отметки <strong>В сборку</strong>. Неотмеченные кастомные карты не включаются в следующую сборку; штатные песни сохраняются.</li>
+<li>Нажмите <strong>Состав новой сборки</strong> и проверьте список.</li>
+<li>Нажмите <strong>Собрать кэш</strong>. Дождитесь сообщения <strong>Готово</strong>. Этап проверки может занять время после записи большого файла.</li>
+<li>Нажмите <strong>Открыть готовые файлы</strong>. В папке результата лежат инструкция, список песен, отчёт и папка <code>Android</code>.</li>
+<li>Откройте внутри результата:</li>
+</ol>
+<pre><code class="language-text">Android\obb\com.beatgames.beatsaber\
+├─ main.1716.com.beatgames.beatsaber.obb
+└─ espresso
+</code></pre>
+<ol start="6">
+<li>На очках полностью закройте игру. Убедитесь, что у вас есть резервная копия прежних <strong>обоих</strong> файлов.</li>
+<li>Через Проводник скопируйте <strong>эту готовую пару</strong> в <code>PICO 4 → Внутренний общий накопитель → Android → obb → com.beatgames.beatsaber</code>, заменив одноимённые файлы. На очки отправляется полный OBB.</li>
+<li>Дождитесь завершения копирования. Запустите игру, откройте выбранный пак и проверьте новую песню и нужную сложность.</li>
+</ol>
+<p>Не смешивайте OBB из одной новой сборки с espresso из другой. Сам патчер устройство не перезаписывает и APK игры не устанавливает. Прохождение проверок на ПК не заменяет игровой тест.</p>
+<h3>Если результат не подошёл</h3>
+<p>Закройте игру и верните на очки сохранённую резервную пару OBB + espresso. Локальную библиотеку патчера для этого удалять не нужно.</p>
+<p><a id="update"></a></p>
+<h2>9. Добавить песни в следующий раз</h2>
+<ol>
+<li>Выберите актуальный совместимый OBB, который уже содержит ваши песни: можно использовать сохранённый результат последней сборки или свежую копию с очков.</li>
+<li>Держите соответствующий espresso рядом с ним. Нажмите <strong>Прочитать</strong>.</li>
+<li>Найденные кастомные карты отметятся для включения. Добавьте новые песни или снимите отметки с ненужных.</li>
+<li>Соберите новый кэш и вручную перенесите готовую пару на очки.</li>
+</ol>
+<p>Готовые игровые данные переиспользуются, поэтому заново добавлять исходные ZIP и перекодировать каждую старую песню не нужно. Перенос по USB всё равно выполняется полным итоговым OBB.</p>
+<p><a id="delete"></a></p>
+<h2>10. Исключить или удалить песни</h2>
+<p><strong>Убрать песню из следующего кэша:</strong> снимите отметку <strong>В сборку</strong> и соберите новый OBB. Это позволяет оставить исходник в локальной библиотеке.</p>
+<p><strong>Удалить с ПК:</strong> выделите строки → <strong>Удалить выбранные…</strong> → проверьте имена и пути в подтверждении → подтвердите. Удаляются принадлежащие им локальные файлы, поэтому заранее сохраните нужные исходники.</p>
+<p><strong>Очистить локальные песни, которых нет в актуальном кэше:</strong> сначала выберите и прочитайте нужный OBB → <strong>Удалить локальные вне OBB…</strong> → просмотрите список. Сравнение идёт с выбранным файлом на ПК по точным ID версий карт, а не с живым содержимым очков. Старая и новая генерации одной песни имеют разные ID.</p>
+<p>Локальное удаление не меняет исходный OBB и устройство. Если затем вновь прочитать кэш, в котором песня по-прежнему есть, она снова появится в библиотеке. Для удаления из кэша нужно исключить её из сборки, собрать результат и перенести его на очки.</p>
+<p><a id="errors"></a></p>
+<h2>11. Частые вопросы и ошибки</h2>
+<table>
+<thead>
+<tr>
+<th>Ситуация</th>
+<th>Что проверить</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PICO не видно в Проводнике</strong></td>
+<td>Очки включены; кабель передаёт данные; разрешён доступ к файлам; выбран File Transfer. Стриминг игры на ПК не означает, что передача файлов включена.</td>
+</tr>
+<tr>
+<td><strong>Не вижу com.beatgames.beatsaber / нужных файлов</strong></td>
+<td>Версию игры, путь <code>Android/obb</code>, доступ к файлам. Не подставляйте кэш от другой версии или другой игры.</td>
+</tr>
+<tr>
+<td><strong>Нужен espresso</strong></td>
+<td>Скопируйте файл без расширения из той же папки кэша очков и положите рядом с выбранным OBB на ПК.</td>
+</tr>
+<tr>
+<td><strong>Пустая основная таблица, но в игре есть OST</strong></td>
+<td>Штатные песни смотрите через <strong>Песни внутри</strong>. Основная таблица содержит добавленные карты.</td>
+</tr>
+<tr>
+<td><strong>Песни есть в OBB, но не отмечены</strong></td>
+<td>Проверьте выбранный путь и нажмите <strong>Прочитать</strong>. Столбец <strong>В этом OBB</strong> сравнивает конкретные ID, а не только название песни.</td>
+</tr>
+<tr>
+<td><strong>ZIP импортировался с замечаниями</strong></td>
+<td>Откройте <strong>Подробности</strong>, проверьте оставшиеся сложности и требования модов. При необходимости скачайте другую совместимую карту.</td>
+</tr>
+<tr>
+<td><strong>В игре No data / нет кнопки начать</strong></td>
+<td>Проверьте, что перенесены оба файла из одной завершённой сборки, версия игры совпадает и выбрана поддержанная сложность. Попробуйте другую авторскую карту или новую AI-карту из исходного аудио. Для сообщения об ошибке сохраните ID карты и текст отчёта.</td>
+</tr>
+<tr>
+<td><strong>После включения стен или бомб ничего не поменялось</strong></td>
+<td>Выделите старые AI-карты и нажмите <strong>Пересоздать AI</strong>, затем соберите и перенесите новый кэш.</td>
+</tr>
+<tr>
+<td><strong>Не удалось скачать FFmpeg</strong></td>
+<td>Интернет и доступ к GitHub; повторите обработку. При ошибке контрольной суммы непроверенная загрузка не запускается.</td>
+</tr>
+<tr>
+<td><strong>Отказано в доступе / WinError 5</strong></td>
+<td>Папка программы и output доступны для записи; исходные/готовые файлы не открыты другой программой. Дождитесь завершения сборки. Если программа сообщила готовый путь в рабочей папке с <code>ГОТОВО.txt</code>, используйте этот проверенный результат. Папку с <code>СБОРКА_НЕ_ГОТОВА.txt</code> на очки не переносите.</td>
+</tr>
+<tr>
+<td><strong>Слишком много или мало блоков</strong></td>
+<td>Сначала сравните Easy/Normal/Hard. Попробуйте другой профиль модели и пересоздание. Модель на 40 песнях экспериментальная; рост набора не гарантирует удобства.</td>
+</tr>
+<tr>
+<td><strong>Перенос занимает много времени</strong></td>
+<td>OBB копируется полностью; размер растёт с числом песен. Дождитесь завершения операции и проверьте свободное место.</td>
+</tr>
+</tbody>
+</table>
+<h2>12. Что приложить к сообщению об ошибке</h2>
+<p>Сообщайте в <a href="https://github.com/BeatPico/PicoSongPatcher/issues">Issues проекта</a>: версию патчера и порта, действие перед ошибкой, текст ошибки, ID BeatSaver и сложность, если проблема в карте. Для сбоя обработки журнал или ошибка сохраняются в папке <code>data</code> (<code>logs</code>, <code>last_error.txt</code>, <code>last_import.txt</code> — в зависимости от операции).</p>
+<p>Перед публикацией журнала удалите личные пути и названия, которыми не хотите делиться. Не загружайте игровые кэши, музыку и всю свою библиотеку.</p><footer>Pico Song Patcher 1.4.1 · Справка хранится на вашем компьютере и открывается без интернета.</footer></main></body></html>
