@@ -27,10 +27,11 @@ body:
     attributes:
       label: AI-модель
       options:
+        - Модель не указана или не помню
         - Дообученная на 10 песнях
         - Экспериментальная на 40 песнях
         - Исходный InfernoSaber
-        - Другая модель или не помню
+        - Другая модель
     validations:
       required: true
   - type: dropdown
@@ -55,6 +56,7 @@ body:
     attributes:
       label: Как проверяли результат?
       options:
+        - Пока не указано
         - Играл в очках
         - Только просмотр карты или видео
     validations:
