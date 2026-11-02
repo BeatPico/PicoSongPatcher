@@ -40,3 +40,5 @@ __pycache__/
 /current_cache_songs.txt
 /beatsage_page.html
 /ai_engine/training_runs/
+/release_build/
+/release_artifacts/

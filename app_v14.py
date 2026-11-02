@@ -28,7 +28,7 @@ from neural_autogen import (available as ai_available, engine_root, generate,
 HOME = Path(sys.executable).resolve().parent if getattr(sys, 'frozen', False) else SOURCE
 ASSETS = Path(getattr(sys, '_MEIPASS', SOURCE)) / 'assets'
 DEFAULT_BASE = ''
-VERSION = '1.4'
+VERSION = '1.4.1'
 
 
 class Window:
@@ -50,7 +50,7 @@ class Window:
         source = (self.library.state.get('cache_obb') or self.library.state.get('source_obb')
                   or self.library.state.get('base_obb') or DEFAULT_BASE)
 
-        root.title('Pico Song Patcher 1.4 · Библиотека и паки')
+        root.title('Pico Song Patcher '+VERSION+' · Библиотека и паки')
         root.geometry('1140x920')
         root.minsize(1140, 820)
         root.configure(bg='#f3f5f8')

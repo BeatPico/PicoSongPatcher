@@ -77,7 +77,8 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
         existing['enabled']=True
         if replace_entry and replace_entry is not existing:replace_entry['enabled']=False
         library.save();return existing,False
-    root=engine_root();ffmpeg=(assets/'tools/ffmpeg.exe').resolve()
+    from portable_assets import ensure_ffmpeg
+    root=engine_root();ffmpeg=ensure_ffmpeg(assets,library.root/'runtime_assets',log).resolve()
     tmp=library.root/'tmp';tmp.mkdir(exist_ok=True)
     logs=library.root/'logs';logs.mkdir(exist_ok=True)
     log_path=logs/('ai_'+datetime.now().strftime('%Y%m%d_%H%M%S_%f')+'.log')

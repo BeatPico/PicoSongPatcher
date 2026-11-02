@@ -101,13 +101,14 @@ def finalize_folder(stage,final,log=print):
     return stage
 
 
-def _new_level(entry,library_root,assets,work):
+def _new_level(entry,library_root,assets,work,ffmpeg=None):
+    ffmpeg=ffmpeg or assets/'tools/ffmpeg.exe'
     folder=Path(library_root)/entry['folder'];parsed=inspect_map(folder,entry.get('compatible',False))
     require(parsed['hash']==entry['hash'],'Файлы в библиотеке изменились: '+entry['title'])
     info=parsed['info'];wav=work/'audio.wav'
-    run_ffmpeg(assets/'tools/ffmpeg.exe',['-i',resolve_file(folder,info['_songFilename']),'-ac','2','-ar','44100','-c:a','pcm_s16le',wav,'-y'])
+    run_ffmpeg(ffmpeg,['-i',resolve_file(folder,info['_songFilename']),'-ac','2','-ar','44100','-c:a','pcm_s16le',wav,'-y'])
     fsb,frames,pcm_hash=bank(wav);preview=work/'preview.wav'
-    loudness=run_ffmpeg(assets/'tools/ffmpeg.exe',['-i',wav,'-af','ebur128','-f','null','NUL'])
+    loudness=run_ffmpeg(ffmpeg,['-i',wav,'-af','ebur128','-f','null','NUL'])
     match=re.search(r'Integrated loudness:\s+I:\s+([-\d.]+) LUFS',loudness)
     lufs=float(match.group(1)) if match else -8.
     with wave.open(str(wav),'rb') as audio:
@@ -125,6 +126,9 @@ def _new_level(entry,library_root,assets,work):
 def build(base,entries,library_root,output_root,assets,log=print,target_pack='ostvol1'):
     base=Path(base).resolve();assets=Path(assets).resolve();output_root=Path(output_root).resolve();library_root=Path(library_root).resolve()
     require(base.is_file(),'Выбери исходный OBB. Подходит кэш с уже добавленными песнями.')
+    from portable_assets import game_assets,ensure_ffmpeg
+    packaged_assets=assets
+    assets=game_assets(base,assets,library_root/'runtime_assets',log)
     require(len({e['level_id'] for e in entries})==len(entries),'В библиотеке повторяется ID песни.')
     for entry in entries:require('/' not in entry['level_id'] and '\\' not in entry['level_id'] and entry['level_id'] not in ('.','..'),'Небезопасный ID песни.')
     output_root.mkdir(parents=True,exist_ok=True);stamp=datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%f')
@@ -170,7 +174,8 @@ def build(base,entries,library_root,output_root,assets,log=print,target_pack='os
                     reports.append({'id':level_id,'title':entry['title'],'reused_native':True,'packs':sorted(where)})
                 else:
                     require(entry.get('storage')!='cache-reference','Для переноса этой песни нужны её локальные данные или исходный OBB: '+entry['title'])
-                    raw,parsed,preview,frames,duration,lufs=_new_level(entry,library_root,assets,work)
+                    ffmpeg=ensure_ffmpeg(packaged_assets,library_root/'runtime_assets',log)
+                    raw,parsed,preview,frames,duration,lufs=_new_level(entry,library_root,assets,work,ffmpeg)
                     for pack_id in where:menu(pack_id).add(parsed,level_id,preview,frames,duration,lufs);changes.add(pack_id)
                     native=retarget_native(raw,level_id,packs[sorted(where)[0]]['package_prefix'])
                     path=work/(hashlib.sha256(level_id.encode()).hexdigest()+'.bundle');path.write_bytes(native);native_files[asset]=path
