@@ -288,7 +288,7 @@ def build(base,entries,library_root,output_root,assets,log=print):
         inventory['path']=str(final/'Android/obb/com.beatgames.beatsaber'/OBB)
         (stage/'cache_inventory.json').write_text(json.dumps(inventory,ensure_ascii=False,indent=2),encoding='utf-8')
         (stage/'ПЕСНИ_В_КЭШЕ.txt').write_text(text_report(inventory),encoding='utf-8')
-        report={'app_version':'1.3','base_sha256':BASE_HASH,'output_sha256':digest(dest/OBB),
+        report={'app_version':'1.3.1','base_sha256':BASE_HASH,'output_sha256':digest(dest/OBB),
                 'songs':reports,'ost1_song_count':10+len(reports),'source_files_written':False,'device_written':False,
                 'local_checks_passed':True,'new_charts_require_headset_playtest':True}
         (stage/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')

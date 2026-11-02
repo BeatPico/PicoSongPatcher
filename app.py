@@ -8,7 +8,7 @@ import tkinter as tk
 from tkinter import ttk,filedialog,messagebox,simpledialog
 from library import Library,inspect_map,resolve_file
 from engine import build,OBB
-from neural_autogen import generate,available as ai_available,ALGORITHM as AI_ALGORITHM,engine_root,selected_model
+from neural_autogen import generate,available as ai_available,ALGORITHM as AI_ALGORITHM,engine_root,selected_model,object_options,needs_regeneration
 from model_profiles import profiles
 from model_training import train as train_model
 from cache_view import inspect_cache,text_report,compare_library
@@ -24,7 +24,7 @@ class Window:
         if saved_output and Path(saved_output).is_dir():self.last_output=Path(saved_output)
         source_path=self.library.state.get('source_obb') or (DEFAULT_BASE if Path(DEFAULT_BASE).is_file() else self.library.state.get('base_obb',''))
         preview_path=self.library.state.get('cache_obb') or self.library.state.get('base_obb') or source_path
-        root.title('Pico Song Patcher 1.3 · Обучение AI');root.geometry('1180x950');root.minsize(1120,880)
+        root.title('Pico Song Patcher 1.3.1 · Стены и бомбы');root.geometry('1180x950');root.minsize(1120,880)
         root.configure(bg='#f3f5f8')
         style=ttk.Style();style.theme_use('clam')
         style.configure('.',font=('Segoe UI',10));style.configure('TFrame',background='#f3f5f8')
@@ -66,6 +66,11 @@ class Window:
         self.controls.append(self.model_combo);self.refresh_models()
         self.button(model_row,'Дообучить на примерах',self.train_model).pack(side='left',padx=7)
         self.button(model_row,'Сравнение моделей',self.show_model_report).pack(side='left')
+        self.ai_walls=tk.BooleanVar(value=bool(self.library.state.get('ai_walls',False)))
+        self.ai_bombs=tk.BooleanVar(value=bool(self.library.state.get('ai_bombs',False)))
+        for label,variable in [('Стены',self.ai_walls),('Бомбы',self.ai_bombs)]:
+            control=ttk.Checkbutton(model_row,text=label,variable=variable,command=self.save_object_options)
+            control.pack(side='left',padx=(8,0));self.controls.append(control)
         self.compatible=tk.BooleanVar(value=False)
         check=ttk.Checkbutton(frame,text='Упрощать карты с модами (анимации и особые правила будут удалены)',variable=self.compatible)
         check.pack(anchor='w',pady=(0,8));self.controls.append(check)
@@ -107,6 +112,10 @@ class Window:
         if record:
             self.library.state['ai_model']=record['id'];self.library.save()
             self.log('Выбрана AI-модель: '+record['label'])
+    def save_object_options(self):
+        self.library.state.update(ai_walls=bool(self.ai_walls.get()),ai_bombs=bool(self.ai_bombs.get()))
+        self.library.save()
+        self.log('Стены и бомбы: настройки применятся к новым и пересозданным AI-картам.')
     def show_model_report(self):
         try:
             selected=selected_model(self.library)
@@ -239,7 +248,7 @@ class Window:
         selected=[self.library.state['songs'][int(i)] for i in self.tree.selection()]
         try:profile=selected_model(self.library)
         except Exception as error:messagebox.showerror('Модель',str(error));return
-        selected=[s for s in selected if s.get('auto_algorithm')!=AI_ALGORITHM or s.get('ai_model','base')!=profile['id'] or (profile['id']!='base' and s.get('ai_model_revision')!=profile['revision'])]
+        selected=[s for s in selected if needs_regeneration(s,profile,object_options(self.library))]
         if not selected:
             messagebox.showinfo('Выбери песни','Выдели старые Auto-карты или другие песни, которые хочешь пересоздать.\nБудет использована полная музыка из библиотеки и создан новый AI-рисунок.\nКарты этой версии AI уже готовы.');return
         self.set_busy(True)
@@ -382,7 +391,7 @@ def main():
         check['source_obb']=app.base.get();check['cache_obb']=app.cache_path.get()
         root.update_idletasks();check['bottom_widget_y']=app.logbox.winfo_rooty()+app.logbox.winfo_height()-root.winfo_rooty();check['window_height']=root.winfo_height()
         import numpy as np
-        check['numpy']=np.__version__;check['version']='1.3';check['ai_engine']=ai_available();check['ai_models']=[p['id'] for p in app.models]
+        check['numpy']=np.__version__;check['version']='1.3.1';check['ai_engine']=ai_available();check['ai_models']=[p['id'] for p in app.models];check['ai_objects']=object_options(app.library)
         (HOME/'self_test.json').write_text(json.dumps(check,indent=2),encoding='utf-8');root.destroy();return
     root.mainloop()
 

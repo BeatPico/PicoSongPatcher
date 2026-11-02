@@ -34,11 +34,12 @@ def run(job):
     config.v1_lighting_vocabulary_path=str(bundle/'v1_lighting/onehot_encoder_events.pkl')
     config.v2_arrows_variety=0.;config.v2_inference_threads=2;config.v2_timing_batch_size=8
     config.v2_calm_effects=False
-    config.add_bombs_flag=False
+    config.add_bombs_flag=bool(job.get('bombs',False))
     config.add_obstacle_flag=bool(job.get('walls',False))
     config.add_slider_flag=True
     config.bs_mapping_version='v3';config.create_expert_flag=False
     configure_inference();emit('Загрузка обученных моделей…')
+    emit('Объекты: стены '+('вкл.' if config.add_obstacle_flag else 'выкл.')+', бомбы '+('вкл.' if config.add_bombs_flag else 'выкл.'))
     runtime=V2Runtime(bundle)
     with wave.open(job['audio'],'rb') as wav:duration=wav.getnframes()/wav.getframerate()
     plan=windows(duration);charts={name:blank() for name in job['difficulties']};reports=[]
@@ -86,9 +87,13 @@ def run(job):
     report={'backend':'InfernoSaber v2','audio_seconds':duration,'serialized_bpm':60.,'chunks':len(plan),
         'cropped_audio':False,'duration_limit':None,'difficulties':{n:len(c['colorNotes']) for n,c in charts.items()},
         'parts':reports,'stitching':finishes,'model_revision':job.get('model_revision','e0f4c8b53f4c52fc30c5b66fd7384c0ce85884ff'),
-        'model_profile':profile['id'],'model_label':profile['label']}
+        'model_profile':profile['id'],'model_label':profile['label'],
+        'objects_enabled':{'walls':bool(job.get('walls',False)),'bombs':bool(job.get('bombs',False))},
+        'objects':{name:{'walls':len(chart['obstacles']),'bombs':len(chart['bombNotes']),
+                         'arcs':len(chart['sliders'])} for name,chart in charts.items()}}
     (work/'analysis.json').write_text(json.dumps(report,ensure_ascii=False,indent=2,default=ordinary,allow_nan=False),encoding='utf-8')
     emit('Нейросетевые карты готовы: '+', '.join(n+' '+str(len(c['colorNotes'])) for n,c in charts.items()))
+    for name,counts in report['objects'].items():emit(name+': стен — '+str(counts['walls'])+', бомб — '+str(counts['bombs']))
     return report
 
 if __name__=='__main__':
