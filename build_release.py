@@ -27,7 +27,7 @@ def sha(path):
 
 
 def ignored(folder, names):
-    excluded = {'__pycache__', 'tests', 'test', '.git', '.pytest_cache', 'Scripts'}
+    excluded = {'__pycache__', '.git', '.pytest_cache', 'Scripts'}
     media = {'.wav', '.mp3', '.ogg', '.flac', '.m4a', '.mp4', '.obb', '.apk', '.pem', '.key', '.pfx'}
     return [name for name in names if name in excluded or (Path(name).suffix.lower() in media and name != 'cacert.pem') or name == 'direct_url.json']
 
@@ -134,6 +134,13 @@ def finish():
         'Извлечение аудио из готовых карт поддерживает PCM16-кэш патчера; для других сжатых FSB используй исходный MP3/ZIP. Переиспользование готовых карт декодирования не требует.\n\n'
         'Проект и сообщения об ошибках: https://github.com/BeatPico/PicoSongPatcher\n', encoding='utf-8')
     files = [path for path in TARGET.rglob('*') if path.is_file() and path.name != 'PAYLOAD.json']
+    for path in files:
+        relative=path.relative_to(TARGET)
+        if (relative.parts[0]=='data' and relative.as_posix()!='data/library.json'
+                or relative.parts[0]=='output' or '__pycache__' in relative.parts
+                or relative.parts[:2]==('ai_engine','cache')
+                or path.name in ('self_test.json','last_build.json','cache_inventory.json')):
+            raise ValueError('A smoke-test or user file remains in the public payload: '+str(relative))
     forbidden = [str(path.relative_to(TARGET)) for path in files if path.suffix.lower() in ('.obb', '.apk', '.mp3', '.ogg', '.wav', '.flac') or path.name in ('original_espresso', 'gameplay_template.bundle', 'fmod.dll', 'training_project.txt', 'library_snapshot.json')]
     if forbidden:
         raise ValueError('Private/game payload in public build: ' + str(forbidden))
