@@ -1,0 +1,4 @@
+[submodule "ai_engine/infernosaber"]
+	path = ai_engine/infernosaber
+	url = https://github.com/fred-brenner/InfernoSaber---BeatSaber-Automapper.git
+	ignore = untracked
