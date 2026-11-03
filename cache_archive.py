@@ -8,6 +8,7 @@ import zipfile
 
 import UnityPy
 from maps import require, PatcherError
+from arenas import environments_in_archive
 
 DIFFICULTIES={0:'Easy',1:'Normal',2:'Hard',3:'Expert',4:'ExpertPlus'}
 MODES={-7286399427822119286:'Standard',-5623662769225589684:'OneSaber',
@@ -31,6 +32,7 @@ class CacheArchive:
     def __init__(self,path,assets=None):
         self.path=Path(path).resolve();require(self.path.is_file(),'Кэш OBB не найден.')
         self.before=self.path.stat();self.stock=stock_ids(assets);self.archive=zipfile.ZipFile(self.path)
+        self.assets=Path(assets) if assets else Path(__file__).resolve().parent/'assets'
         self.names=set(self.archive.namelist());require(len(self.names)==len(self.archive.namelist()),'В кэше повторяются имена файлов.')
         require('assets/aa/catalog.json' in self.names,'В OBB отсутствует каталог ресурсов Beat Saber.')
         self._packs={}
@@ -92,6 +94,7 @@ class CacheArchive:
         after=self.path.stat();require((self.before.st_size,self.before.st_mtime_ns)==(after.st_size,after.st_mtime_ns),'Кэш менялся во время чтения. Дождись окончания копирования.')
         ids={s['id'] for s in songs if s['custom']}
         return {'path':str(self.path),'bytes':after.st_size,'mtime_ns':after.st_mtime_ns,'packs':packs,'songs':songs,
+            'arenas':environments_in_archive(self.names,self.assets),
             'total':len(songs),'custom':len(ids),'ai':len({s['id'] for s in songs if s['kind']=='AI'}),
             'auto':len({s['id'] for s in songs if s['kind']=='Старый Auto'}),
             'missing_gameplay':sorted({s['id'] for s in songs if s['custom'] and (not s['gameplay_present'] or not s['unity_header'])}),

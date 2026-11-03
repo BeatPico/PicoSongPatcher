@@ -17,10 +17,11 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 
 from cache_archive import cached_audio, inspect_cache, text_report
+from arenas import DEFAULT_ARENA, VARIED_ARENA
 from cache_builder import build
 from library import inspect_map, resolve_file
 from library_v14 import LibraryV14
-from model_profiles import profiles
+from model_profiles import profiles, selected_id
 from model_training import train as train_model
 from neural_autogen import (available as ai_available, engine_root, generate,
                             needs_regeneration, object_options, selected_model)
@@ -28,7 +29,7 @@ from neural_autogen import (available as ai_available, engine_root, generate,
 HOME = Path(sys.executable).resolve().parent if getattr(sys, 'frozen', False) else SOURCE
 ASSETS = Path(getattr(sys, '_MEIPASS', SOURCE)) / 'assets'
 DEFAULT_BASE = ''
-VERSION = '1.4.1'
+VERSION = '1.5.0'
 
 
 class Window:
@@ -128,11 +129,20 @@ class Window:
         self.button(pack_row, 'Назначить выбранным', self.assign_pack).pack(side='left', padx=6)
         self.button(pack_row, 'Удалить локальные вне OBB…', self.remove_outside_cache).pack(side='right')
 
+        arena_row = ttk.Frame(frame)
+        arena_row.grid(row=8, column=0, sticky='ew', pady=(0, 6))
         self.compatible = tk.BooleanVar(root, value=False)
-        compatible = ttk.Checkbutton(frame, text='Упрощать карты с модами (анимации и особые правила будут удалены)',
+        compatible = ttk.Checkbutton(arena_row, text='Упрощать карты с модами (без анимаций и особых правил)',
                                      variable=self.compatible)
-        compatible.grid(row=8, column=0, sticky='w', pady=(0, 6))
+        compatible.pack(side='left')
         self.controls.append(compatible)
+        self.arena_name = tk.StringVar(root)
+        self.arena_combo = ttk.Combobox(arena_row, textvariable=self.arena_name, state='readonly', width=26)
+        self.arena_combo.pack(side='right')
+        ttk.Label(arena_row, text='Арена AI:').pack(side='right', padx=6)
+        self.arena_combo.bind('<<ComboboxSelected>>', self.choose_ai_arena)
+        self.controls.append(self.arena_combo)
+        self.refresh_arenas()
 
         table = ttk.Frame(frame)
         table.grid(row=9, column=0, sticky='nsew')
@@ -201,7 +211,7 @@ class Window:
     def refresh_models(self):
         self.models = profiles(engine_root())
         self.model_combo.configure(values=[profile['label'] for profile in self.models])
-        current = self.library.state.get('ai_model', 'base')
+        current = selected_id(engine_root(), self.library.state.get('ai_model'))
         record = next((profile for profile in self.models if profile['id'] == current), None)
         self.model_name.set(record['label'] if record else 'Модель недоступна: ' + current)
 
@@ -213,6 +223,20 @@ class Window:
             self.library.state['ai_model'] = record['id']
             self.library.save()
             self.log('Выбрана AI-модель: ' + record['label'])
+
+    def refresh_arenas(self):
+        arenas = (self.inventory or {}).get('arenas', [DEFAULT_ARENA])
+        self.arena_labels = {'Стандартная': DEFAULT_ARENA}
+        if len(arenas) > 1:
+            self.arena_labels['Разные для песен'] = VARIED_ARENA
+        self.arena_labels.update({name.removesuffix('Environment'): name for name in arenas if name != DEFAULT_ARENA})
+        self.arena_combo.configure(values=list(self.arena_labels))
+        wanted = self.library.state.get('ai_arena_mode', DEFAULT_ARENA)
+        self.arena_name.set(next((label for label, mode in self.arena_labels.items() if mode == wanted), 'Стандартная'))
+
+    def choose_ai_arena(self, event=None):
+        self.library.state['ai_arena_mode'] = self.arena_labels[self.arena_name.get()]
+        self.library.save()
 
     def save_object_options(self):
         if self.busy:
@@ -404,7 +428,7 @@ class Window:
         self._stop_drag()
         for control in self.controls:
             control.configure(state='disabled' if busy else 'normal')
-        for combo in (self.model_combo, self.pack_combo):
+        for combo in (self.model_combo, self.pack_combo, self.arena_combo):
             combo.configure(state='disabled' if busy else 'readonly')
         self.cache_entry.configure(state='disabled' if busy else 'normal')
         self.open_button.configure(state='normal' if not busy and self.last_output else 'disabled')
@@ -438,6 +462,7 @@ class Window:
     def cache_path_changed(self, *args):
         if self.inventory and not self.same_cache_path(self.cache_path.get(), self.inventory['path']):
             self.inventory = None
+            self.refresh_arenas()
             self.cache_summary.set('Путь изменён. Нажми «Прочитать», чтобы загрузить песни выбранного OBB.')
             self.refresh()
 
@@ -450,6 +475,7 @@ class Window:
         path = str(Path(path).resolve())
         self.cache_path.set(path)
         self.inventory = None
+        self.refresh_arenas()
         self._build_after_read = build_after
         self.cache_summary.set('Читаю все паки и добавленные песни из OBB…')
         self.refresh()
@@ -461,6 +487,7 @@ class Window:
         self.cache_path.set(inventory['path'])
         self.packs = inventory['packs']
         self.refresh_packs()
+        self.refresh_arenas()
         ids = {song['id'] for song in inventory['songs'] if song['custom']}
         by_id = {song['id']: song for song in inventory['songs'] if song['custom']}
         for entry in self.library.state['songs']:
@@ -652,6 +679,8 @@ class Window:
         if self.busy:
             return
         compatible, pack = self.compatible.get(), self.current_pack()
+        if audio:
+            self.choose_ai_arena()
 
         def task():
             errors, notes = [], []
@@ -702,7 +731,12 @@ class Window:
         except Exception as error:
             messagebox.showerror('Модель', str(error), parent=self.root)
             return
-        selected = [entry for entry in self.selected_entries() if needs_regeneration(entry, profile, objects)]
+        self.choose_ai_arena()
+        arena_mode = self.library.state['ai_arena_mode']
+        arenas = (self.inventory or {}).get('arenas', [DEFAULT_ARENA])
+        selected = [entry for entry in self.selected_entries()
+                    if needs_regeneration(entry, profile, objects, arena_mode=arena_mode)
+                    or entry.get('ai_arena', DEFAULT_ARENA) not in arenas]
         if not selected:
             messagebox.showinfo('Выбери песни', 'Выдели песни для пересоздания. Карты с выбранной моделью и текущими настройками уже готовы.', parent=self.root)
             return
@@ -738,7 +772,8 @@ class Window:
             project = Path(pointer.read_text(encoding='utf-8').strip())
 
         def prepared_file(folder):
-            return next((folder / relative for relative in ('training_examples_40/preparation_result.json',
+            return next((folder / relative for relative in ('training_examples_70/preparation_result.json',
+                                                           'training_examples_40/preparation_result.json',
                                                            'training_examples/preparation_result.json')
                          if (folder / relative).is_file()), None)
 
@@ -752,7 +787,7 @@ class Window:
             if prepared is None:
                 messagebox.showerror('Обучающие данные', 'Нет training_examples_40/preparation_result.json или training_examples/preparation_result.json.', parent=self.root)
                 return
-        source_profile = self.library.state.get('ai_model', 'base')
+        source_profile = selected_id(engine_root(), self.library.state.get('ai_model'))
         self.log('Обучение выбранной модели на подготовленных эталонах. Выделенные песни библиотеки в обучение не входят.')
         self.run_worker(lambda: train_model(engine_root(), project, log=lambda text: self.events.put(('log', text)),
                                             prepared_file=prepared, source_profile=source_profile),

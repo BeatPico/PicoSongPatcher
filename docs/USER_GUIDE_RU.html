@@ -1,19 +1,19 @@
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pico Song Patcher — инструкция к EXE</title><style>
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#eef2f8;color:#24324b;font:16px/1.65 "Segoe UI",Arial,sans-serif}main{max-width:1120px;margin:36px auto;padding:42px 56px;background:white;border-radius:20px;box-shadow:0 12px 40px #24324b0d}h1{font-size:34px;line-height:1.25;color:#18223d;margin-top:0}h2{margin-top:45px;padding-top:16px;border-top:1px solid #dfe5ef;color:#463d97;font-size:25px}h3{font-size:20px;color:#463d97}a{color:#5145bc;text-underline-offset:3px}a:hover{color:#176b5b}strong{color:#172744}li{margin:.55em 0}code{font-family:Consolas,monospace;font-size:.9em;background:#f1f4fa;border-radius:4px;padding:2px 5px;overflow-wrap:anywhere}pre{overflow-x:auto;padding:20px 24px;background:#111c35;color:#e4ecff;border-radius:12px;line-height:1.55}pre code{background:none;padding:0;color:inherit;overflow-wrap:normal}table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px}td,th{border:1px solid #dce3ee;text-align:left;vertical-align:top;padding:12px 15px}th{background:#edf0fb;color:#3b3486}tbody tr:nth-child(even){background:#f8fafc}td:first-child{width:29%}img{max-width:100%;height:auto;border-radius:12px}footer{margin-top:40px;color:#64748b;font-size:14px}@media(max-width:740px){main{margin:0;border-radius:0;padding:26px 20px}h1{font-size:27px}h2{font-size:22px}table{font-size:13px}td,th{padding:8px}pre{font-size:12px;padding:14px}}@media print{body{background:white}main{box-shadow:none;margin:0;padding:0;max-width:none}h2{break-after:avoid}tr{break-inside:avoid}a{color:inherit}pre{white-space:pre-wrap;background:#f5f5f5;color:black}}
-</style></head><body><main><h1>Pico Song Patcher 1.4.1: инструкция к EXE</h1>
+</style></head><body><main><h1>Pico Song Patcher 1.5.0: инструкция к EXE</h1>
 <p>Программа для Windows x64 добавляет готовые карты и создаёт AI-карты из музыки для <strong>Beat Saber 1.40.8 / OVRport 3.2.2 на Pico 4</strong>. Она работает с локальной копией кэша. Установленная совместимая игра и собственные игровые файлы нужны отдельно.</p>
 <p><strong>Первый запуск:</strong> скачать ZIP → распаковать целиком → скопировать OBB и espresso с очков → выбрать OBB → добавить песни → собрать кэш → вручную перенести результат на очки.</p>
 <p><a href="#download">Скачать и запустить</a> · <a href="#cache">Выгрузить кэш</a> · <a href="#buttons">Кнопки</a> · <a href="#maps">Готовые карты</a> · <a href="#ai">Музыка и AI</a> · <a href="#install">Собрать и перенести</a> · <a href="#update">Обновить кэш</a> · <a href="#delete">Удалить песни</a> · <a href="#errors">Ошибки</a></p>
 <p><a id="download"></a></p>
 <h2>1. Скачать и запустить</h2>
 <ol>
-<li>Откройте <a href="https://github.com/BeatPico/PicoSongPatcher/releases/latest">последний выпуск на GitHub</a>.</li>
-<li>В <strong>Assets</strong> скачайте <strong>PicoSongPatcher-1.4.1-Windows-x64.zip</strong>. Автоматические ссылки <strong>Source code</strong> предназначены для исходников.</li>
+<li>Возьмите архив <strong>PicoSongPatcher-1.5.0-Windows-x64.zip</strong>.</li>
+<li>Опубликованные версии доступны в <a href="https://github.com/BeatPico/PicoSongPatcher/releases">Releases на GitHub</a>. В разделе <strong>Assets</strong> архив для Windows содержит программу, а ссылки <strong>Source code</strong> ведут к исходникам.</li>
 <li>В Проводнике выберите <strong>Извлечь всё</strong>. Распакуйте весь архив в отдельную доступную для записи папку, например <code>D:\PicoSongPatcher</code>.</li>
-<li>Откройте распакованную папку и запустите <strong>PicoSongPatcher-1.4.1-Windows-x64.exe</strong>. Не запускайте его внутри ZIP и не переносите отдельно от папок <code>_internal</code> и <code>ai_engine</code>.</li>
+<li>Откройте распакованную папку и запустите <strong>PicoSongPatcher-1.5.0-Windows-x64.exe</strong>. Храните EXE вместе с папками <code>_internal</code> и <code>ai_engine</code>.</li>
 <li>Рядом лежит <strong>ИНСТРУКЦИЯ.html</strong>. Её также открывает кнопка <strong>Инструкция</strong> в программе; для чтения интернет не нужен.</li>
 </ol>
-<p>Python устанавливать не требуется. В комплекте пустая библиотека, отдельное CPU AI-окружение и три модели. Для первой обработки аудио нужен интернет: FFmpeg загрузится из <a href="https://github.com/BtbN/FFmpeg-Builds">BtbN/FFmpeg-Builds</a> с проверкой размера и SHA256. Далее обработка локальная.</p>
+<p>В комплекте пустая библиотека, отдельное CPU AI-окружение и модели на 10 и 70 песнях. При первом использовании модели программа восстановит ссылки на общие веса. Для первой обработки аудио нужен интернет, чтобы загрузить FFmpeg с проверкой размера и SHA256. Далее обработка локальная. <a href="https://github.com/BtbN/FFmpeg-Builds">BtbN/FFmpeg-Builds</a></p>
 <p>Оставьте свободное место для исходного кэша, нового OBB и временных файлов. С добавлением песен итоговый OBB может заметно вырасти.</p>
 <p><a id="cache"></a></p>
 <h2>2. Где взять кэш с Pico</h2>
@@ -70,7 +70,7 @@
 <p><a id="buttons"></a></p>
 <h2>4. Что где находится и какие кнопки нажимать</h2>
 <p><img alt="Схема главного окна" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgwIiBoZWlnaHQ9IjQ2MCIgdmlld0JveD0iMCAwIDEwODAgNDYwIiByb2xlPSJpbWciIGFyaWEtbGFiZWxsZWRieT0idGl0bGUgZGVzYyI+Cjx0aXRsZSBpZD0idGl0bGUiPtCh0YXQtdC80LAg0LPQu9Cw0LLQvdC+0LPQviDQvtC60L3QsCBQaWNvIFNvbmcgUGF0Y2hlcjwvdGl0bGU+PGRlc2MgaWQ9ImRlc2MiPtCo0LXRgdGC0Ywg0L7QsdC70LDRgdGC0LXQuTog0LLRi9Cx0L7RgCDQutGN0YjQsCwg0LTQvtCx0LDQstC70LXQvdC40LUg0L/QtdGB0LXQvSwg0LzQvtC00LXQu9GMINC4INC+0LHRitC10LrRgtGLLCDQv9Cw0LosINCx0LjQsdC70LjQvtGC0LXQutCwLCDRgdCx0L7RgNC60LAg0Lgg0YHQv9GA0LDQstC60LAuPC9kZXNjPgo8cmVjdCB3aWR0aD0iMTA4MCIgaGVpZ2h0PSI0NjAiIHJ4PSIxOCIgZmlsbD0iI2VlZjJmOCIvPjxnIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSxBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjMjQzMjRiIj4KPHRleHQgeD0iMzAiIHk9IjM2IiBmb250LXNpemU9IjIzIiBmb250LXdlaWdodD0iNzAwIj5QaWNvIFNvbmcgUGF0Y2hlciDCtyDRgdGF0LXQvNCwINC+0LrQvdCwPC90ZXh0Pgo8ZyBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjZDVkZGVhIj48cmVjdCB4PSI2NCIgeT0iNTciIHdpZHRoPSI5ODgiIGhlaWdodD0iNTAiIHJ4PSI4Ii8+PHJlY3QgeD0iNjQiIHk9IjExOSIgd2lkdGg9Ijk4OCIgaGVpZ2h0PSI0MyIgcng9IjgiLz48cmVjdCB4PSI2NCIgeT0iMTc0IiB3aWR0aD0iOTg4IiBoZWlnaHQ9IjQzIiByeD0iOCIvPjxyZWN0IHg9IjY0IiB5PSIyMjkiIHdpZHRoPSI5ODgiIGhlaWdodD0iNDMiIHJ4PSI4Ii8+PHJlY3QgeD0iNjQiIHk9IjI4NCIgd2lkdGg9Ijk4OCIgaGVpZ2h0PSI4NyIgcng9IjgiLz48cmVjdCB4PSI2NCIgeT0iMzgzIiB3aWR0aD0iOTg4IiBoZWlnaHQ9IjQ5IiByeD0iOCIvPjwvZz4KPGcgZmlsbD0iIzY4NTJkNiI+PGNpcmNsZSBjeD0iMzIiIGN5PSI4MiIgcj0iMTciLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjE0MCIgcj0iMTciLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjE5NSIgcj0iMTciLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjI1MCIgcj0iMTciLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyNyIgcj0iMTciLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjQwNyIgcj0iMTciLz48L2c+CjxnIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNzAwIj48dGV4dCB4PSIzMiIgeT0iODciPjE8L3RleHQ+PHRleHQgeD0iMzIiIHk9IjE0NSI+MjwvdGV4dD48dGV4dCB4PSIzMiIgeT0iMjAwIj4zPC90ZXh0Pjx0ZXh0IHg9IjMyIiB5PSIyNTUiPjQ8L3RleHQ+PHRleHQgeD0iMzIiIHk9IjMzMiI+NTwvdGV4dD48dGV4dCB4PSIzMiIgeT0iNDEyIj42PC90ZXh0PjwvZz4KPHRleHQgeD0iODEiIHk9Ijg4Ij7Qn9GD0YLRjCDQuiBPQkIg0L3QsCDQn9CaPC90ZXh0Pjx0ZXh0IHg9IjYxMCIgeT0iODgiPtCS0YvQsdGA0LDRgtGMIE9CQuKApjwvdGV4dD48dGV4dCB4PSI3OTAiIHk9Ijg4Ij7Qn9GA0L7Rh9C40YLQsNGC0Yw8L3RleHQ+PHRleHQgeD0iOTIwIiB5PSI4OCI+0J/QtdGB0L3QuCDQstC90YPRgtGA0Lg8L3RleHQ+Cjx0ZXh0IHg9IjgxIiB5PSIxNDYiPtCU0L7QsdCw0LLQuNGC0Ywg0L/QsNC/0LrRg+KApjwvdGV4dD48dGV4dCB4PSIyNjUiIHk9IjE0NiI+0JTQvtCx0LDQstC40YLRjCBaSVDigKY8L3RleHQ+PHRleHQgeD0iNDM1IiB5PSIxNDYiPtCY0LcgTVAzIChBSSnigKY8L3RleHQ+PHRleHQgeD0iNTk1IiB5PSIxNDYiPtCf0LXRgNC10YHQvtC30LTQsNGC0YwgQUk8L3RleHQ+PHRleHQgeD0iNzc1IiB5PSIxNDYiPtCS0LrQuy4gLyDQstGL0LrQuy48L3RleHQ+PHRleHQgeD0iOTA3IiB5PSIxNDYiPtCj0LTQsNC70LjRgtGM4oCmPC90ZXh0Pgo8dGV4dCB4PSI4MSIgeT0iMjAxIj5BSS3QvNC+0LTQtdC70Yw8L3RleHQ+PHRleHQgeD0iMjg3IiB5PSIyMDEiPtCe0LHRg9GH0LjRgtGMINC80L7QtNC10LvRjCDQvdCwINGN0YLQsNC70L7QvdCw0YU8L3RleHQ+PHRleHQgeD0iNTYzIiB5PSIyMDEiPtCh0YDQsNCy0L3QtdC90LjQtSDQvNC+0LTQtdC70LXQuTwvdGV4dD48dGV4dCB4PSI4MTAiIHk9IjIwMSI+4piRINCh0YLQtdC90Ys8L3RleHQ+PHRleHQgeD0iOTMwIiB5PSIyMDEiPuKYkSDQkdC+0LzQsdGLPC90ZXh0Pgo8dGV4dCB4PSI4MSIgeT0iMjU2Ij7Qn9Cw0Log0LTQu9GPINC90L7QstGL0YUg0L/QtdGB0LXQvTwvdGV4dD48dGV4dCB4PSI0MjAiIHk9IjI1NiI+0J3QsNC30L3QsNGH0LjRgtGMINCy0YvQsdGA0LDQvdC90YvQvDwvdGV4dD48dGV4dCB4PSI3NzEiIHk9IjI1NiI+0KPQtNCw0LvQuNGC0Ywg0LvQvtC60LDQu9GM0L3Ri9C1INCy0L3QtSBPQkLigKY8L3RleHQ+Cjx0ZXh0IHg9IjgxIiB5PSIzMTAiIGZvbnQtd2VpZ2h0PSI2MDAiPtCSINGB0LHQvtGA0LrRgyDCtyDQkiDRjdGC0L7QvCBPQkIgwrcg0J/QtdGB0L3RjyDCtyDQmNGB0L/QvtC70L3QuNGC0LXQu9GMIMK3INCf0LDQuiDCtyDQktC10YDRgdC40Y8gQUkgwrcg0KHQu9C+0LbQvdC+0YHRgtC4PC90ZXh0PjxwYXRoIGQ9Ik04MCAzMjBoOTU2IiBzdHJva2U9IiNkNWRkZWEiLz48dGV4dCB4PSI4MSIgeT0iMzQ2IiBmaWxsPSIjNjQ3NDhiIj7QodGC0YDQvtC60Lgg0LHQuNCx0LvQuNC+0YLQtdC60Lg6INC60LvQuNC6IC8g0L/RgNC+0YLRj9Cz0LjQstCw0L3QuNC1INC80YvRiNC4IC8gQ3RybCAvIFNoaWZ0PC90ZXh0Pgo8dGV4dCB4PSI4MSIgeT0iNDEzIiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMTc2YjViIj7QodC+0LHRgNCw0YLRjCDQutGN0Yg8L3RleHQ+PHRleHQgeD0iMjQzIiB5PSI0MTMiPtCe0YLQutGA0YvRgtGMINCz0L7RgtC+0LLRi9C1INGE0LDQudC70Ys8L3RleHQ+PHRleHQgeD0iNTA0IiB5PSI0MTMiPtCf0L7QtNGA0L7QsdC90L7RgdGC0Lg8L3RleHQ+PHRleHQgeD0iNjgyIiB5PSI0MTMiPtCh0L7RgdGC0LDQsiDQvdC+0LLQvtC5INGB0LHQvtGA0LrQuDwvdGV4dD48dGV4dCB4PSI5MzYiIHk9IjQxMyI+0JjQvdGB0YLRgNGD0LrRhtC40Y88L3RleHQ+CjwvZz48L3N2Zz4K" /></p>
-<p>Это схема групп элементов. Названия ниже соответствуют кнопкам версии 1.4.1.</p>
+<p>Это схема групп элементов. Поле <strong>Арена AI</strong> находится справа над таблицей песен.</p>
 <table>
 <thead>
 <tr>
@@ -122,6 +122,10 @@
 <tr>
 <td><strong>Стены / Бомбы</strong></td>
 <td>Включить эти объекты в новых и пересозданных AI-картах. Уже сохранённые карты от переключения галочек не меняются.</td>
+</tr>
+<tr>
+<td><strong>Арена AI</strong></td>
+<td>Выбрать стандартную арену, сцену из прочитанного OBB или режим <strong>Разные для песен</strong>. В последнем режиме одна песня получает одну арену на всех сложностях. Повторная генерация того же файла с тем же набором арен использует тот же выбор.</td>
 </tr>
 <tr>
 <td><strong>Сравнение моделей</strong></td>
@@ -190,8 +194,8 @@
 <p><a id="ai"></a></p>
 <h2>6. Сделать карту из обычной музыки</h2>
 <ol>
-<li>В поле <strong>AI-модель</strong> оставьте <strong>Дообученная · 10 песен</strong> для первого теста. Модель на 40 песнях доступна как экспериментальная; больше примеров пока не дали улучшения всех итоговых метрик.</li>
-<li>Выберите пак назначения, включите <strong>Стены</strong> и <strong>Бомбы</strong>, если хотите эти объекты.</li>
+<li>В поле <strong>AI-модель</strong> выберите профиль на <strong>10</strong> или <strong>70</strong> песнях. Профиль на 70 продолжает обучение модели на 40 песнях.</li>
+<li>Выберите пак назначения и <strong>Арену AI</strong>. Включите <strong>Стены</strong> и <strong>Бомбы</strong>, если хотите эти объекты. Игра может подставлять свою арену, если в её настройках включено переопределение окружения.</li>
 <li>Нажмите <strong>Из MP3 (AI)…</strong> и выберите одну или несколько аудиозаписей.</li>
 <li>В окне BPM оставьте <strong>Авто</strong>, если темп неизвестен. Число от 40 до 320 применяется ко всем выбранным файлам, поэтому разные известные BPM задавайте отдельными запусками.</li>
 <li>Дождитесь завершения по журналу внизу окна. Обрабатывается полная запись; для длинных песен AI использует части с контекстом.</li>
@@ -296,7 +300,7 @@
 </tr>
 <tr>
 <td><strong>Слишком много или мало блоков</strong></td>
-<td>Сначала сравните Easy/Normal/Hard. Попробуйте другой профиль модели и пересоздание. Модель на 40 песнях экспериментальная; рост набора не гарантирует удобства.</td>
+<td>Сначала сравните Easy/Normal/Hard. Попробуйте другой профиль модели и пересоздание.</td>
 </tr>
 <tr>
 <td><strong>Перенос занимает много времени</strong></td>
@@ -306,4 +310,4 @@
 </table>
 <h2>12. Что приложить к сообщению об ошибке</h2>
 <p>Сообщайте в <a href="https://github.com/BeatPico/PicoSongPatcher/issues">Issues проекта</a>: версию патчера и порта, действие перед ошибкой, текст ошибки, ID BeatSaver и сложность, если проблема в карте. Для сбоя обработки журнал или ошибка сохраняются в папке <code>data</code> (<code>logs</code>, <code>last_error.txt</code>, <code>last_import.txt</code> — в зависимости от операции).</p>
-<p>Перед публикацией журнала удалите личные пути и названия, которыми не хотите делиться. Не загружайте игровые кэши, музыку и всю свою библиотеку.</p><footer>Pico Song Patcher 1.4.1 · Справка хранится на вашем компьютере и открывается без интернета.</footer></main></body></html>
+<p>Перед публикацией журнала удалите личные пути и названия, которыми не хотите делиться. Не загружайте игровые кэши, музыку и всю свою библиотеку.</p><footer>Pico Song Patcher · Справка хранится на вашем компьютере и открывается без интернета.</footer></main></body></html>

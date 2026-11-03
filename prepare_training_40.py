@@ -17,6 +17,16 @@ ENGINE = APP / 'ai_engine'
 ROOT = APP / 'training_examples_40'
 ORIGINAL = APP / 'training_examples/prepared/20261101T192705Z'
 BUNDLE = ENGINE / 'models/v2_expert'
+if '--expand-70' in sys.argv:
+    previous = json.loads((ROOT / 'preparation_result.json').read_text(encoding='utf-8'))
+    ORIGINAL = Path(previous['beat_dataset']).parent
+    ROOT = APP / 'training_examples_70'
+    BUNDLE = ENGINE / 'models/experiments/finetune-20261102T174826024561Z/bundle'
+PRIOR_COUNT = 40 if '--expand-70' in sys.argv else 10
+TOTAL_COUNT = PRIOR_COUNT + 30
+PRIOR_SPLITS = {'train': PRIOR_COUNT - (8 if PRIOR_COUNT == 40 else 2),
+                'validation': 4 if PRIOR_COUNT == 40 else 1, 'test': 4 if PRIOR_COUNT == 40 else 1}
+EXPECTED_SPLITS = Counter(PRIOR_SPLITS) + Counter(train=24, validation=3, test=3)
 for key, value in {'CUDA_VISIBLE_DEVICES': '-1', 'TF_CPP_MIN_LOG_LEVEL': '2',
     'TF_NUM_INTRAOP_THREADS': '2', 'TF_NUM_INTEROP_THREADS': '2',
     'OMP_NUM_THREADS': '2', 'MPLBACKEND': 'Agg',
@@ -103,7 +113,7 @@ def main():
 
     started = time.perf_counter()
     selection = read_json(ROOT / 'manifest.json')
-    assert len(selection['packages']) == 40 and selection['new_packages'] == 30
+    assert len(selection['packages']) == TOTAL_COUNT and selection['new_packages'] == 30
     original_selection = Path(selection['original_manifest'])
     assert digest(original_selection) == selection['original_manifest_sha256']
     model_hashes = {str(path.relative_to(BUNDLE)): digest(path)
@@ -116,9 +126,9 @@ def main():
     vocabulary = read_json(BUNDLE / 'vocabularies.json')
     original_songs, original_manifest = load_beat(ORIGINAL / 'beat')
     original_splits = prior_splits_from_manifest(ORIGINAL / 'beat')
-    assert Counter(original_splits.values()) == {'train': 8, 'validation': 1, 'test': 1}
+    assert Counter(original_splits.values()) == PRIOR_SPLITS
     assert original_manifest['normalization'] == statistics
-    sources = [str((ROOT / p['training_package']).resolve()) for p in selection['packages'][10:]]
+    sources = [str((ROOT / p['training_package']).resolve()) for p in selection['packages'][PRIOR_COUNT:]]
     log('Extracting unmodified beat features for 30 additional recordings...')
     new_songs, report = prepare_songs(source_root=sources)
     assert not report['skipped'], report['skipped']
@@ -134,14 +144,14 @@ def main():
             assert song.metadata['split'] == original_splits[song.metadata['group_id']]
     report.update(original_dataset=str(ORIGINAL / 'beat'),
         original_preparation=original_manifest.get('preparation'), normalization_from=str(BUNDLE / 'intensity'),
-        split_policy=split_audit, success_count=len(songs), group_count=40)
+        split_policy=split_audit, success_count=len(songs), group_count=TOTAL_COUNT)
     report['songs'] = [{'song_id': s.song_id, 'group_id': s.metadata['group_id'],
         'split': s.metadata['split'], 'duration': s.metadata['duration'],
         'original_notes': s.metadata['original_colored_note_count'],
         'retained_notes': s.metadata['retained_colored_note_count'],
         'unique_onsets': s.metadata['unique_onset_count']} for s in songs]
     save(run / 'split_audit.json', split_audit)
-    log('Writing beat dataset: ' + str(len(songs)) + ' charts, fixed original 8/1/1 plus new 24/3/3 recordings')
+    log(f'Writing beat dataset: {len(songs)} charts, splits {dict(EXPECTED_SPLITS)}')
     write_beat(beat, songs, statistics, report)
     load_beat(beat)
 
@@ -153,7 +163,7 @@ def main():
     for song in prior_v2.songs:
         writer.add(song)
         records.append(_preparation_record(song))
-    log('Preserved 30 original v2 chart inputs; encoding only the new charts on CPU...')
+    log(f'Preserved {len(records)} original v2 chart inputs; encoding only the new charts on CPU...')
     encoder = EncoderFactory(BUNDLE / 'encoder/encoder.h5', settings)
     def progress(event):
         if event.get('phase') == 'examples':
@@ -179,7 +189,7 @@ def main():
         nps.append(len(song.base.arrays['retained_indices']) / meta['duration'])
         for key in ('bombs', 'walls', 'arcs', 'chains'):
             object_counts[key] += len(song.objects.get(key, []))
-    assert len(groups) == 40 and Counter(groups.values()) == {'train': 32, 'validation': 4, 'test': 4}
+    assert len(groups) == TOTAL_COUNT and Counter(groups.values()) == EXPECTED_SPLITS
     assert len(loaded.songs) == len(songs), dataset.manifest['skipped']
     assert all(digest(BUNDLE / path) == value for path, value in model_hashes.items())
     assert digest(original_selection) == selection['original_manifest_sha256']
@@ -191,7 +201,7 @@ def main():
             sparse_support[stage] = 'train_and_validation_positive_and_negative_support'
         except ValueError as error:
             sparse_support[stage] = str(error)
-    result = {'status': 'prepared_and_validated', 'packages': 40,
+    result = {'status': 'prepared_and_validated', 'packages': TOTAL_COUNT,
         'charts': len(loaded.songs), 'beat_charts': len(songs),
         'split_recordings': dict(Counter(groups.values())), 'split_charts': dict(chart_counts),
         'actual_retained_nps_min': min(nps), 'actual_retained_nps_max': max(nps),

@@ -159,6 +159,9 @@ def build(base,entries,library_root,output_root,assets,log=print,target_pack='os
             for index,entry in enumerate(entries,1):
                 level_id=entry['level_id'];where=desired[level_id];existing=locations.get(level_id,set());asset='assets/BeatmapLevelsData/'+level_id.lower()
                 log(f'Песня {index}/{len(entries)}: '+entry['title'])
+                if entry.get('ai_arena') and not existing:
+                    require(entry['ai_arena'] in inventory['arenas'],
+                            'В этом OBB нет арены для песни «'+entry['title']+'». Выбери другую арену и пересоздай AI.')
                 if existing and where<=existing:
                     require(asset in source.names,'В исходном OBB нет игровых данных: '+entry['title'])
                     reports.append({'id':level_id,'title':entry['title'],'reused_native':True,'packs':sorted(where)});continue

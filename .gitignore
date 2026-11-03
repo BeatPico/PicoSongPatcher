@@ -42,3 +42,5 @@ __pycache__/
 /ai_engine/training_runs/
 /release_build/
 /release_artifacts/
+/training_examples_70/
+/ai_engine/model_selection.json

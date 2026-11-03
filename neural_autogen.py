@@ -5,7 +5,8 @@ from pathlib import Path
 from PIL import Image,ImageDraw,ImageFont
 from maps import PatcherError,require
 from engine import run_ffmpeg
-from model_profiles import resolve_profile
+from model_profiles import profiles, resolve_profile
+from arenas import DEFAULT_ARENA, available_arenas, choose_arena
 from ai_engine.gameplay_options import GAMEPLAY_REVISION,normalize_gameplay_options
 
 ALGORITHM='infernosaber-v2-pico-1.2.0'
@@ -17,10 +18,10 @@ def engine_root():
 
 def available():
     root=engine_root()
-    return all((root/name).is_file() for name in ('runtime/python.exe','worker.py','models/v2_expert/bundle.json','models_lock.json'))
+    return all((root/name).is_file() for name in ('runtime/python.exe','worker.py')) and bool(profiles(root))
 
 def selected_model(library):
-    return resolve_profile(engine_root(),library.state.get('ai_model','base'))
+    return resolve_profile(engine_root(),library.state.get('ai_model'))
 
 def object_options(library):
     return {'walls':bool(library.state.get('ai_walls',False)),
@@ -30,13 +31,14 @@ def current_gameplay_options(library):
     value=library.state.get('ai_gameplay_options')
     return normalize_gameplay_options({} if value is None else value)
 
-def needs_regeneration(song,profile,objects,gameplay_options=None):
+def needs_regeneration(song,profile,objects,gameplay_options=None,arena_mode=DEFAULT_ARENA):
     stored=song.get('ai_objects',{'walls':False,'bombs':False})
     gameplay_options=normalize_gameplay_options({} if gameplay_options is None else gameplay_options)
     return (song.get('auto_algorithm')!=ALGORITHM or song.get('ai_model','base')!=profile['id']
             or (profile['id']!='base' and song.get('ai_model_revision')!=profile['revision'])
             or any(bool(stored.get(key,False))!=value for key,value in objects.items())
-            or song.get('ai_gameplay_revision')!=GAMEPLAY_REVISION or song.get('ai_gameplay_options')!=gameplay_options)
+            or song.get('ai_gameplay_revision')!=GAMEPLAY_REVISION or song.get('ai_gameplay_options')!=gameplay_options
+            or song.get('ai_arena_mode',DEFAULT_ARENA)!=arena_mode)
 
 def cover(path,title,key):
     picture=Image.new('RGB',(512,512),'#182737');draw=ImageDraw.Draw(picture)
@@ -53,7 +55,7 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
     require(source.is_file(),'Аудиофайл не найден.')
     require(source.suffix.lower() in ('.mp3','.wav','.flac','.m4a','.ogg','.egg','.aac','.wma','.opus'),
         'Выбери MP3, WAV, FLAC, M4A, OGG, AAC, WMA или OPUS.')
-    require(available(),'Не найден полный AI-движок. Запусти версию 1.2 из её папки вместе с каталогом ai_engine.')
+    require(available(),'Не найден полный AI-движок. Распакуй комплект целиком вместе с каталогом ai_engine.')
     difficulties=dict(difficulties or DEFAULT_DIFFICULTIES)
     require(difficulties and all(n in ['Easy','Normal','Hard','Expert','ExpertPlus'] and 0.5<=v<=10 for n,v in difficulties.items()),'Неверные сложности AI-карты.')
     if bpm_override is not None:require(40<=float(bpm_override)<=320,'BPM должен быть от 40 до 320.')
@@ -61,6 +63,9 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
     with source.open('rb') as f:
         for block in iter(lambda:f.read(1024*1024),b''):fingerprint.update(block)
     source_hash=fingerprint.hexdigest()
+    arena_mode=library.state.get('ai_arena_mode',DEFAULT_ARENA)
+    cache=library.state.get('cache_obb') or library.state.get('source_obb') or library.state.get('base_obb')
+    arena=choose_arena(arena_mode,available_arenas(cache,assets),source_hash) if arena_mode!=DEFAULT_ARENA else DEFAULT_ARENA
     seed_fingerprint=fingerprint.copy()
     seed_fingerprint.update(json.dumps([ALGORITHM,MODEL_REVISION,bpm_override,difficulties],sort_keys=True).encode())
     generation_seed=int(seed_fingerprint.hexdigest()[:8],16)%2147483647
@@ -71,6 +76,8 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
     fingerprint.update(json.dumps([ALGORITHM,revision,bpm_override,difficulties],sort_keys=True).encode())
     if any(objects.values()):fingerprint.update(json.dumps(['objects-v1',objects],sort_keys=True).encode())
     fingerprint.update(json.dumps([GAMEPLAY_REVISION,gameplay_options],sort_keys=True).encode())
+    if arena_mode!=DEFAULT_ARENA:
+        fingerprint.update(json.dumps(['arena-v1',arena_mode,arena]).encode())
     key=fingerprint.hexdigest();level_id='PicoAutoAI'+key[:20]
     existing=next((e for e in library.state['songs'] if e['level_id']==level_id),None)
     if existing:
@@ -127,7 +134,7 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
             '_songAuthorName':artist,'_levelAuthorName':'InfernoSaber AI / Pico Song Patcher',
             '_beatsPerMinute':60.,'_songTimeOffset':0.,'_shuffle':0.,'_shufflePeriod':0.,
             '_previewStartTime':min(30,duration/3),'_previewDuration':12,
-            '_songFilename':'song.ogg','_coverImageFilename':'cover.jpg','_environmentName':'DefaultEnvironment',
+            '_songFilename':'song.ogg','_coverImageFilename':'cover.jpg','_environmentName':arena,
             '_difficultyBeatmapSets':[{'_beatmapCharacteristicName':'Standard','_difficultyBeatmaps':[
                 {'_difficulty':name,'_difficultyRank':ranks[name],'_beatmapFilename':name+'.dat',
                  '_noteJumpMovementSpeed':min(20,10+difficulties[name]*1.5),'_noteJumpStartBeatOffset':0}
@@ -136,11 +143,13 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
         for name in difficulties:shutil.copy2(charts/(name+'.dat'),folder/(name+'.dat'))
         entry,added=library.import_path(folder,level_id=level_id)
         target=library.root/entry['folder']
-        shutil.copy2(charts/'analysis.json',target/'AI_analysis.json')
+        report.update(arena=arena,arena_mode=arena_mode)
+        (target/'AI_analysis.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
         estimated=[r['estimated_bpm'] for r in report['parts']]
         entry.update(autogenerated=True,auto_algorithm=ALGORITHM,auto_backend='InfernoSaber v2',
             ai_model=profile['id'],ai_model_label=profile['label'],ai_model_revision=revision,
             ai_objects=objects,
+            ai_arena_mode=arena_mode,ai_arena=arena,
             ai_gameplay_revision=GAMEPLAY_REVISION,ai_gameplay_options=gameplay_options,
             auto_bpm=sum(estimated)/len(estimated),source_audio=(replace_entry or {}).get('source_audio',source.name),
             source_audio_sha256=source_hash,full_audio_seconds=duration,ai_difficulties=difficulties,
