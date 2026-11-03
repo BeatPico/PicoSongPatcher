@@ -10,7 +10,7 @@ from functools import wraps
 import math
 import random
 
-GAMEPLAY_REVISION = 'motion-1.4-v1'
+GAMEPLAY_REVISION = 'motion-1.5-v2'
 DEFAULT_GAMEPLAY_OPTIONS = {
     'wall_modes': ['side', 'crouch'],
     'arc_probability': .35,
@@ -87,6 +87,22 @@ def filter_gameplay_objects(state, options):
                       if ('crouch' if wall['y'] == 2 and wall['width'] == 4 else 'side') in modes]
     return {'revision': GAMEPLAY_REVISION, 'removed_high_or_unattached_arcs': len(arcs) - len(accepted),
             'removed_wall_modes': len(walls) - len(state['walls'])}
+
+
+def space_beginner_hazards(chart, difficulty):
+    """Leave a recovery gap after each wall or bomb in the BPM-60 export."""
+    gap = {'Easy': 8., 'Normal': 5.}.get(difficulty)
+    if gap is None:
+        return
+    fields = ('obstacles', 'bombNotes')
+    hazards = [(item['b'], field, item) for field in fields for item in chart[field]]
+    kept = {field: [] for field in fields}
+    available = -math.inf
+    for time, field, item in sorted(hazards, key=lambda event: event[0]):
+        if time >= available:
+            kept[field].append(item)
+            available = time + (item['d'] if field == 'obstacles' else 0.) + gap
+    chart.update(kept)
 
 
 @contextmanager

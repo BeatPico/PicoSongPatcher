@@ -1,9 +1,16 @@
 import unittest
 from types import SimpleNamespace
 from neural_autogen import ALGORITHM, needs_regeneration, object_options, current_gameplay_options, GAMEPLAY_REVISION
+from ai_engine.gameplay_options import space_beginner_hazards
 
 
 class GenerationObjectsTest(unittest.TestCase):
+    def test_beginner_hazards_share_a_recovery_gap_after_wall_end(self):
+        wall = {'b': 1., 'd': 3.}
+        chart = {'obstacles': [wall], 'bombNotes': [{'b': 11.}, {'b': 12.}], 'colorNotes': [{'b': 7.}]}
+        space_beginner_hazards(chart, 'Easy')
+        self.assertEqual(chart, {'obstacles': [wall], 'bombNotes': [{'b': 12.}], 'colorNotes': [{'b': 7.}]})
+
     def test_current_maps_remain_current_with_objects_disabled(self):
         song={'auto_algorithm':ALGORITHM,'ai_model':'base','ai_gameplay_revision':GAMEPLAY_REVISION,
               'ai_gameplay_options':current_gameplay_options(SimpleNamespace(state={}))}

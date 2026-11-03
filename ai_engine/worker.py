@@ -20,7 +20,8 @@ def run(job):
     from map_creation.v2_export import serialize_beatmap
     from full_song import windows,blank,append_window,finish
     import numpy as np
-    from gameplay_options import normalize_gameplay_options,apply_gameplay_options,filter_gameplay_objects,seeded_generation,GAMEPLAY_REVISION
+    from gameplay_options import (normalize_gameplay_options, apply_gameplay_options, filter_gameplay_objects,
+                                  seeded_generation, space_beginner_hazards, GAMEPLAY_REVISION)
     gameplay=normalize_gameplay_options(job.get('object_options'))
     seed=int(job.get('seed',127))
     np.random.seed(seed)
@@ -89,6 +90,8 @@ def run(job):
     seams=[p[2] for p in plan[1:]];finishes={}
     for name,chart in charts.items():
         finishes[name]=finish(chart,duration,seams)
+        if gameplay is not None:
+            space_beginner_hazards(chart, name)
         if len(chart['colorNotes'])<4:raise ValueError(name+': запись слишком тихая или не содержит подходящих музыкальных акцентов')
         (work/(name+'.dat')).write_text(json.dumps(chart,separators=(',',':'),allow_nan=False),encoding='utf-8')
     def ordinary(value):
