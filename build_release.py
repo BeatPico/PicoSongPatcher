@@ -9,7 +9,7 @@ import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parent
-VERSION = '1.5.2'
+VERSION = '1.5.3'
 MODEL_10 = 'finetune-20261102T113535114682Z'
 MODEL_40 = 'finetune-20261102T174826024561Z'
 NAME = 'PicoSongPatcher-' + VERSION + '-Windows-x64'

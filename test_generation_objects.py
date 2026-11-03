@@ -7,6 +7,33 @@ from song_names import clean_song_name
 
 
 class GenerationObjectsTest(unittest.TestCase):
+    def test_section_pacing_caps_finale_and_fills_only_audible_accent(self):
+        import numpy as np
+        from ai_engine.section_pacing import apply_pacing
+        chart = blank()
+        times = [2., 3., 4., 10., *[14 + i * .1 for i in range(15)]]
+        chart['colorNotes'] = [dict(b=t, c=i % 2, x=1 + i % 2, y=0, d=1) for i, t in enumerate(times)]
+        audio = SimpleNamespace(active=np.ones(20, dtype=bool), audible=np.ones(20, dtype=bool),
+                                accents=np.ones(20), peaks=np.array([6.2]), frame=int)
+        result = apply_pacing(chart, 'Easy', audio)
+        beats = [n['b'] for n in chart['colorNotes']]
+        self.assertEqual(result['gap_notes'], 1)
+        self.assertIn(6.2, beats)
+        self.assertLessEqual(max(sum(t <= v < t + 2 for v in beats) for t in beats), 5)
+
+    def test_section_pacing_retries_an_audible_break_after_wall(self):
+        import numpy as np
+        from ai_engine.section_pacing import apply_pacing
+        chart = blank()
+        chart['colorNotes'] = [dict(b=t, c=0, x=1, y=0, d=1) for t in (2., 10.)]
+        chart['obstacles'] = [dict(b=2.5, d=7., x=0, y=2, w=4, h=3)]
+        audio = SimpleNamespace(active=np.ones(15, dtype=bool), audible=np.ones(15, dtype=bool),
+                                accents=np.ones(15), peaks=np.array([3.4, 4.7, 6.1, 7.5]), frame=int)
+        result = apply_pacing(chart, 'Hard', audio)
+        self.assertEqual(result['shortened_walls'], 1)
+        self.assertGreater(result['gap_notes'], 0)
+        self.assertTrue(all(n['b'] >= 4.95 for n in chart['colorNotes'][1:]))
+
     def test_easy_intro_limits_bursts_without_leaving_an_orphaned_arc(self):
         chart = blank()
         chart['colorNotes'] = [dict(b=t, c=0, x=1, y=0, d=1) for t in (2., 2.1, 2.5, 3., 3.5, 3.8, 16.)]

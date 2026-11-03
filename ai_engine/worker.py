@@ -19,6 +19,7 @@ def run(job):
     from map_creation.v2_runtime import V2Runtime
     from map_creation.v2_export import serialize_beatmap
     from full_song import windows,blank,append_window,finish
+    from section_pacing import AudioPacing, apply_pacing
     import numpy as np
     from gameplay_options import (normalize_gameplay_options, apply_gameplay_options, filter_gameplay_objects,
                                   seeded_generation, space_beginner_hazards, GAMEPLAY_REVISION)
@@ -88,8 +89,12 @@ def run(job):
                     'diagnostics':result.diagnostics,'omissions':omissions})
         if len(plan)>1:audio.unlink()
     seams=[p[2] for p in plan[1:]];finishes={}
+    pacing=AudioPacing(job['audio']) if gameplay is not None else None
     for name,chart in charts.items():
-        finishes[name]=finish(chart,duration,seams,easy_intro=gameplay is not None and name=='Easy')
+        timing_report=apply_pacing(chart,name,pacing) if pacing is not None else None
+        finishes[name]=finish(chart,duration,seams)
+        if timing_report is not None:
+            finishes[name]['section_pacing']=timing_report
         if gameplay is not None:
             space_beginner_hazards(chart, name)
         if len(chart['colorNotes'])<4:raise ValueError(name+': запись слишком тихая или не содержит подходящих музыкальных акцентов')
