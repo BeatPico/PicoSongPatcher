@@ -29,7 +29,7 @@ from neural_autogen import (available as ai_available, engine_root, generate,
 HOME = Path(sys.executable).resolve().parent if getattr(sys, 'frozen', False) else SOURCE
 ASSETS = Path(getattr(sys, '_MEIPASS', SOURCE)) / 'assets'
 DEFAULT_BASE = ''
-VERSION = '1.5.0'
+VERSION = '1.5.1'
 
 
 class Window:
@@ -226,13 +226,11 @@ class Window:
 
     def refresh_arenas(self):
         arenas = (self.inventory or {}).get('arenas', [DEFAULT_ARENA])
-        self.arena_labels = {'Стандартная': DEFAULT_ARENA}
-        if len(arenas) > 1:
-            self.arena_labels['Разные для песен'] = VARIED_ARENA
+        self.arena_labels = {'Разные для песен': VARIED_ARENA, 'Стандартная': DEFAULT_ARENA}
         self.arena_labels.update({name.removesuffix('Environment'): name for name in arenas if name != DEFAULT_ARENA})
         self.arena_combo.configure(values=list(self.arena_labels))
-        wanted = self.library.state.get('ai_arena_mode', DEFAULT_ARENA)
-        self.arena_name.set(next((label for label, mode in self.arena_labels.items() if mode == wanted), 'Стандартная'))
+        wanted = self.library.state.get('ai_arena_mode', VARIED_ARENA)
+        self.arena_name.set(next((label for label, mode in self.arena_labels.items() if mode == wanted), 'Разные для песен'))
 
     def choose_ai_arena(self, event=None):
         self.library.state['ai_arena_mode'] = self.arena_labels[self.arena_name.get()]
@@ -974,6 +972,7 @@ def main():
                  'build_button_visible': bool(window.build_button.winfo_ismapped())}
         check['guide_button_visible'] = bool(window.guide_button.winfo_ismapped())
         check['offline_guide'] = (HOME / 'ИНСТРУКЦИЯ.html').is_file()
+        check['ai_arena_mode'] = window.arena_labels[window.arena_name.get()]
         (HOME / 'self_test.json').write_text(json.dumps(check, ensure_ascii=False, indent=2), encoding='utf-8')
         window.close()
         return

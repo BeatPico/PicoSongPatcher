@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from unittest.mock import patch
+import zipfile
 
 ROOT = Path(__file__).resolve().parent
 sys.path[:0] = [str(ROOT.parent / 'beat_saber_lab/python_packages'), str(ROOT)]
@@ -42,6 +43,24 @@ class BackendV14Test(unittest.TestCase):
         folder.mkdir(parents=True)
         (folder / 'payload.bin').write_bytes(b'local song')
         return folder
+
+    def test_rewrites_zip64_offsets_to_classic_without_changing_members(self):
+        source = self.work / 'old.obb'
+        target = self.work / 'fixed.obb'
+        with patch.object(zipfile, 'ZIP64_LIMIT', 512):
+            with zipfile.ZipFile(source, 'w') as archive:
+                archive.writestr('padding', b'x' * 600)
+                archive.writestr('kiss', b'game data')
+            with zipfile.ZipFile(source) as archive:
+                self.assertEqual(archive.getinfo('kiss').extract_version, 45)
+                cache_builder.write_obb(archive, target)
+            self.assertEqual(zipfile.ZIP64_LIMIT, 512)
+        with zipfile.ZipFile(target) as archive:
+            self.assertEqual(archive.read('kiss'), b'game data')
+            self.assertEqual(archive.read('padding'), b'x' * 600)
+            self.assertEqual(archive.getinfo('kiss').extract_version, 20)
+            self.assertEqual(archive.getinfo('kiss').extra, b'')
+            self.assertNotIn(b'PK\x06\x06', target.read_bytes())
 
     def ready_stage(self):
         stage = self.work / '.building_one'

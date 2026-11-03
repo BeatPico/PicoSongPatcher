@@ -10,6 +10,7 @@ from pathlib import Path
 import shutil
 import struct
 import tempfile
+from threading import Lock
 import time
 import wave
 import zipfile
@@ -21,6 +22,49 @@ from cache_archive import CacheArchive,inspect_cache,cached_parsed,read_json,tex
 from engine import (OBB,Menu,bank,gameplay,run_ffmpeg,digest,encoded,parse_extra,check_pointers)
 from library import inspect_map,resolve_file
 from maps import require,steady_lights
+
+
+_OBB_ZIP_LOCK = Lock()
+
+
+def write_obb(source, destination, blobs=None, native_files=None, pruned=()):
+    """Write classic ZIP offsets up to their unsigned 32-bit limit."""
+    blobs, native_files = blobs or {}, native_files or {}
+    with _OBB_ZIP_LOCK:
+        # CPython promotes offsets to ZIP64 at 2 GiB. The game's ZIP reader
+        # can use unsigned 32-bit offsets, and may reject ZIP64 records.
+        previous_limit = zipfile.ZIP64_LIMIT
+        zipfile.ZIP64_LIMIT = 0xFFFFFFFE
+        try:
+            with zipfile.ZipFile(destination, 'w', allowZip64=False) as result:
+                for item in source.infolist():
+                    if item.filename in pruned or item.filename in native_files:
+                        continue
+                    target = copy.copy(item)
+                    extras, offset = bytearray(), 0
+                    while offset + 4 <= len(item.extra):
+                        tag, size = struct.unpack_from('<HH', item.extra, offset)
+                        end = offset + 4 + size
+                        if tag != 1:
+                            extras.extend(item.extra[offset:end])
+                        offset = end
+                    target.extra = bytes(extras)
+                    if item.extract_version == 45 and item.compress_type in (zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED):
+                        target.extract_version = 20
+                        if target.create_version == 45:
+                            target.create_version = 20
+                    target._compresslevel = 1
+                    if item.filename in blobs:
+                        result.writestr(target, blobs[item.filename])
+                    else:
+                        with source.open(item) as reader, result.open(target, 'w') as writer:
+                            shutil.copyfileobj(reader, writer, 4 * 1024 * 1024)
+                for name, path in native_files.items():
+                    result.write(path, name, compress_type=zipfile.ZIP_STORED)
+        except zipfile.LargeZipFile as error:
+            require(False, 'OBB превышает предел обычного ZIP (4 ГиБ). Убери часть песен и собери заново: ' + str(error))
+        finally:
+            zipfile.ZIP64_LIMIT = previous_limit
 
 
 def patch_catalog(catalog,replacements):
@@ -187,18 +231,11 @@ def build(base,entries,library_root,output_root,assets,log=print,target_pack='os
             blobs={path:raw for path,(raw,crc) in replacements.items()}
             if replacements:blobs['assets/aa/catalog.json']=patch_catalog(json.loads(source.archive.read('assets/aa/catalog.json')),replacements)
             pruned={'assets/BeatmapLevelsData/'+level_id.lower() for level_id in songs if level_id not in desired}
-            if not blobs and not pruned and not native_files:
+            if not blobs and not pruned and not native_files and source.archive.start_dir <= zipfile.ZIP64_LIMIT:
                 log('Все выбранные песни уже готовы: копирование исходного OBB…');shutil.copy2(base,destination/OBB)
             else:
                 log('Запись кэша с сохранением готовых песен…')
-                with zipfile.ZipFile(destination/OBB,'w',allowZip64=True) as result:
-                    for item in source.archive.infolist():
-                        if item.filename in pruned or item.filename in native_files:continue
-                        target=copy.copy(item);target._compresslevel=1
-                        if item.filename in blobs:result.writestr(target,blobs[item.filename])
-                        else:
-                            with source.archive.open(item) as reader,result.open(target,'w') as writer:shutil.copyfileobj(reader,writer,4*1024*1024)
-                    for name,path in native_files.items():result.write(path,name,compress_type=zipfile.ZIP_STORED)
+                write_obb(source.archive,destination/OBB,blobs,native_files,pruned)
             log('Проверка готового кэша…')
             with zipfile.ZipFile(destination/OBB) as result:
                 require(result.testzip() is None,'Повреждён итоговый ZIP-кэш.')

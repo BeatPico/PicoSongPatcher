@@ -6,12 +6,12 @@ from PIL import Image,ImageDraw,ImageFont
 from maps import PatcherError,require
 from engine import run_ffmpeg
 from model_profiles import profiles, resolve_profile
-from arenas import DEFAULT_ARENA, available_arenas, choose_arena
+from arenas import DEFAULT_ARENA, VARIED_ARENA, available_arenas, choose_arena
 from ai_engine.gameplay_options import GAMEPLAY_REVISION,normalize_gameplay_options
 
 ALGORITHM='infernosaber-v2-pico-1.2.0'
 MODEL_REVISION='e0f4c8b53f4c52fc30c5b66fd7384c0ce85884ff'
-DEFAULT_DIFFICULTIES={'Easy':1.5,'Normal':2.5,'Hard':4.0}
+DEFAULT_DIFFICULTIES={'Easy':1.2,'Normal':1.8,'Hard':4.0}
 
 def engine_root():
     return (Path(sys.executable).resolve().parent if getattr(sys,'frozen',False) else Path(__file__).resolve().parent)/'ai_engine'
@@ -37,6 +37,7 @@ def needs_regeneration(song,profile,objects,gameplay_options=None,arena_mode=DEF
     return (song.get('auto_algorithm')!=ALGORITHM or song.get('ai_model','base')!=profile['id']
             or (profile['id']!='base' and song.get('ai_model_revision')!=profile['revision'])
             or any(bool(stored.get(key,False))!=value for key,value in objects.items())
+            or song.get('ai_difficulties', DEFAULT_DIFFICULTIES)!=DEFAULT_DIFFICULTIES
             or song.get('ai_gameplay_revision')!=GAMEPLAY_REVISION or song.get('ai_gameplay_options')!=gameplay_options
             or song.get('ai_arena_mode',DEFAULT_ARENA)!=arena_mode)
 
@@ -63,7 +64,7 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
     with source.open('rb') as f:
         for block in iter(lambda:f.read(1024*1024),b''):fingerprint.update(block)
     source_hash=fingerprint.hexdigest()
-    arena_mode=library.state.get('ai_arena_mode',DEFAULT_ARENA)
+    arena_mode=library.state.get('ai_arena_mode',VARIED_ARENA)
     cache=library.state.get('cache_obb') or library.state.get('source_obb') or library.state.get('base_obb')
     arena=choose_arena(arena_mode,available_arenas(cache,assets),source_hash) if arena_mode!=DEFAULT_ARENA else DEFAULT_ARENA
     seed_fingerprint=fingerprint.copy()

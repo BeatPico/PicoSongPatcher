@@ -35,7 +35,6 @@ def available_arenas(cache, assets):
 def choose_arena(mode, available, audio_sha):
     if mode == VARIED_ARENA:
         alternatives = sorted(set(available) - {DEFAULT_ARENA})
-        require(alternatives, 'Для разных арен выбери OBB с дополнительными сценами.')
-        return alternatives[int(audio_sha[:16], 16) % len(alternatives)]
+        return alternatives[int(audio_sha[:16], 16) % len(alternatives)] if alternatives else DEFAULT_ARENA
     require(mode in available, 'Выбранной арены нет в этом OBB: ' + mode)
     return mode
