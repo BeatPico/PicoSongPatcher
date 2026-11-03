@@ -1,5 +1,6 @@
 """Full-song learned mapping using a separate, portable CPU runtime."""
 import hashlib,json,os,re,shutil,subprocess,sys,tempfile,traceback,wave
+from array import array
 from datetime import datetime
 from pathlib import Path
 from PIL import Image,ImageDraw,ImageFont
@@ -13,6 +14,29 @@ from ai_engine.gameplay_options import GAMEPLAY_REVISION,normalize_gameplay_opti
 ALGORITHM='infernosaber-v2-pico-1.2.0'
 MODEL_REVISION='e0f4c8b53f4c52fc30c5b66fd7384c0ce85884ff'
 DEFAULT_DIFFICULTIES={'Easy':1.2,'Normal':1.8,'Hard':4.0}
+ANALYSIS_PEAK = 10 ** (-1 / 20)
+
+
+def prepare_analysis_audio(ffmpeg, source, wav):
+    # Keep mono downmix peaks in float until gain has been applied. A direct
+    # PCM16 conversion would clip them before the model can see the transients.
+    raw = wav.with_suffix('.f32')
+    metadata = run_ffmpeg(ffmpeg, ['-i', source, '-vn', '-ac', '1', '-ar', '44100',
+                                  '-c:a', 'pcm_f32le', '-f', 'f32le', raw, '-y'])
+    try:
+        peak = 0.
+        with raw.open('rb') as stream:
+            while block := stream.read(1024 * 1024):
+                samples = array('f', block)
+                if sys.byteorder != 'little':
+                    samples.byteswap()
+                peak = max(peak, max(samples), -min(samples))
+        gain = ANALYSIS_PEAK / peak if peak > ANALYSIS_PEAK else 1.
+        run_ffmpeg(ffmpeg, ['-f', 'f32le', '-ar', '44100', '-ac', '1', '-i', raw,
+                            '-af', f'volume={gain:.12g}', '-c:a', 'pcm_s16le', wav, '-y'])
+    finally:
+        raw.unlink(missing_ok=True)
+    return metadata, gain
 
 def engine_root():
     return (Path(sys.executable).resolve().parent if getattr(sys,'frozen',False) else Path(__file__).resolve().parent)/'ai_engine'
@@ -94,7 +118,7 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
     with tempfile.TemporaryDirectory(prefix='ai_full_',dir=tmp) as td:
         folder=Path(td).resolve();wav=folder/'analysis.wav';charts=folder/'charts'
         log('Подготовка полной записи: '+source.name)
-        stderr=run_ffmpeg(ffmpeg,['-i',source,'-vn','-ac','1','-ar','44100','-c:a','pcm_s16le',wav,'-y'])
+        stderr,analysis_gain=prepare_analysis_audio(ffmpeg,source,wav)
         with wave.open(str(wav),'rb') as audio:duration=audio.getnframes()/audio.getframerate()
         require(duration>=8,'Для AI-карты нужно хотя бы 8 секунд музыки.')
         log(f'Вся песня: {int(duration//60)}:{int(duration%60):02d}. Анализ на этом ПК…')
@@ -118,6 +142,7 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
         process.stdout.close();code=process.wait()
         require(code==0,'AI не завершил генерацию. Подробности: '+str(log_path)+'\n'+'\n'.join(tail[-5:]))
         report=json.loads((charts/'analysis.json').read_text(encoding='utf-8'))
+        report['analysis_audio_gain']=analysis_gain
         require(abs(report['audio_seconds']-duration)<0.03,'AI обработал не всю запись.')
         title=replace_entry['title'] if replace_entry else source.stem
         artist=replace_entry.get('artist','') if replace_entry else ''

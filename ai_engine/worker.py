@@ -20,6 +20,7 @@ def run(job):
     from map_creation.v2_export import serialize_beatmap
     from full_song import windows,blank,append_window,finish
     from section_pacing import AudioPacing, apply_pacing
+    from stock_patterns import add_stock_patterns
     import numpy as np
     from gameplay_options import (normalize_gameplay_options, apply_gameplay_options, filter_gameplay_objects,
                                   seeded_generation, space_beginner_hazards, GAMEPLAY_REVISION)
@@ -97,6 +98,7 @@ def run(job):
         finishes[name]=finish(chart,duration,seams,hand_flow=gameplay is not None)
         if timing_report is not None:
             finishes[name]['section_pacing']=timing_report
+            finishes[name]['stock_patterns']=add_stock_patterns(chart,name,pacing)
         if len(chart['colorNotes'])<4:raise ValueError(name+': запись слишком тихая или не содержит подходящих музыкальных акцентов')
         (work/(name+'.dat')).write_text(json.dumps(chart,separators=(',',':'),allow_nan=False),encoding='utf-8')
     def ordinary(value):

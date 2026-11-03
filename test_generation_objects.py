@@ -7,6 +7,20 @@ from song_names import clean_song_name
 
 
 class GenerationObjectsTest(unittest.TestCase):
+    def test_stock_patterns_generate_safe_pairs_and_dots(self):
+        from ai_engine.stock_patterns import add_stock_patterns
+        from maps import convert
+        for difficulty in ('Easy', 'Normal', 'Hard'):
+            chart = blank()
+            chart['colorNotes'] = [dict(b=2.+i, c=i%2, x=1+i%2, y=0, d=1) for i in range(80)]
+            audio = SimpleNamespace(active=[True]*90, accents=[1.]*90, frame=int)
+            result = add_stock_patterns(chart, difficulty, audio)
+            self.assertGreater(result['two_hand_pairs_added'], 0)
+            self.assertGreater(result['single_dots_added'], 0)
+            self.assertEqual(bool(result['crossed_pairs']), difficulty == 'Hard')
+            converted, _, _ = convert(chart)
+            self.assertEqual(len(converted['colorNotes']), len(chart['colorNotes']))
+
     def test_crossovers_need_space_on_both_sides_and_a_cooldown(self):
         chart = blank()
         chart['colorNotes'] = [dict(b=t, c=c, x=x, y=0, d=1) for t, c, x in (

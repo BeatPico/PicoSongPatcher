@@ -9,7 +9,7 @@ import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parent
-VERSION = '1.5.3'
+VERSION = '1.5.4'
 MODEL_10 = 'finetune-20261102T113535114682Z'
 MODEL_40 = 'finetune-20261102T174826024561Z'
 NAME = 'PicoSongPatcher-' + VERSION + '-Windows-x64'
@@ -30,6 +30,10 @@ def sha(path):
 
 def ignored(folder, names):
     excluded = {'__pycache__', '.git', '.pytest_cache', 'Scripts'}
+    if Path(folder).name == 'tensorflow':
+        excluded.add('include')
+    if Path(folder).name == 'joblib':
+        excluded.add('test')
     media = {'.wav', '.mp3', '.ogg', '.flac', '.m4a', '.mp4', '.obb', '.apk', '.pem', '.key', '.pfx'}
     return [name for name in names if name in excluded or (Path(name).suffix.lower() in media and name != 'cacert.pem') or name == 'direct_url.json']
 
@@ -83,18 +87,16 @@ def copy_ai():
             shutil.copy2(path, target / path.name)
 
 
-def copy_models(identifier_70):
-    source, target = ROOT / 'ai_engine', TARGET / 'ai_engine'
+def copy_models(primary, model_engine=None):
+    source, target = Path(model_engine or ROOT / 'ai_engine'), TARGET / 'ai_engine'
     models = target / 'models'
     shared, first = {}, {}
-    print('Copying the 10- and 70-song models with shared weights…', flush=True)
-    for identifier, label, recordings in [
-        (MODEL_10, 'Дообученная · 10 песен', 10),
-        (identifier_70, 'Дообученная · 70 песен', 70),
-    ]:
+    print('Copying the two evaluated models with shared weights…', flush=True)
+    for identifier in (MODEL_10, primary):
         origin = source / 'models/experiments' / identifier
         record = json.loads((origin / 'profile.json').read_text(encoding='utf-8'))
-        if record.get('status') != 'evaluated' or (recordings == 70 and record.get('dataset_recordings') != 70):
+        recordings = 10 if identifier == MODEL_10 else record.get('dataset_recordings', 0)
+        if record.get('status') != 'evaluated' or recordings < 10:
             raise ValueError('The expected evaluated model is required: ' + identifier)
         destination = models / 'experiments' / identifier
         for path in sorted((origin / 'bundle').rglob('*')):
@@ -110,12 +112,12 @@ def copy_models(identifier_70):
                 first[digest] = relative
             output.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, output)
-        profile = {'id': identifier, 'label': label, 'status': 'evaluated', 'experimental': True,
+        profile = {'id': identifier, 'label': 'Дообученная · ' + str(recordings) + ' песен', 'status': 'evaluated', 'experimental': True,
                    'dataset_recordings': recordings, 'report': 'evaluation'}
         (destination / 'profile.json').write_text(json.dumps(profile, ensure_ascii=False, indent=2), encoding='utf-8')
         report = destination / 'evaluation'
         report.mkdir()
-        if recordings == 70:
+        if identifier == primary:
             evaluation = origin / record.get('report', 'evaluation')
             for name in ('report.html', 'report_ru.txt', 'aggregate_summary.json'):
                 if (evaluation / name).is_file():
@@ -124,8 +126,8 @@ def copy_models(identifier_70):
             shutil.copy2(ROOT / 'TRAINING_RESULTS.md', report / 'README.md')
     (models / 'shared_weights.json').write_text(json.dumps(shared, indent=2), encoding='utf-8')
     (target / 'model_selection.json').write_text(json.dumps({
-        'hidden': ['base', MODEL_40], 'default': MODEL_10,
-        'aliases': {'base': MODEL_10, MODEL_40: identifier_70},
+        'hidden': ['base', MODEL_40], 'default': primary,
+        'aliases': {'base': MODEL_10, MODEL_40: primary},
     }, indent=2), encoding='utf-8')
 
 
@@ -148,7 +150,7 @@ def notices():
 def finish():
     data = TARGET / 'data'
     data.mkdir(exist_ok=True)
-    state = {'base_obb': '', 'songs': [], 'ai_model': MODEL_10,
+    state = {'base_obb': '', 'songs': [],
              'ai_walls': True, 'ai_bombs': True, 'target_pack': 'ostvol1'}
     (data / 'library.json').write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding='utf-8')
     shutil.copy2(ROOT / 'THIRD_PARTY.md', TARGET / 'THIRD_PARTY.md')
@@ -162,7 +164,7 @@ def finish():
         '4. Добавляй карты или MP3 и собирай новый кэш. Исходные файлы и устройство программа не перезаписывает.\n'
         '5. При первой обработке аудио программа загрузит FFmpeg с официального репозитория BtbN/FFmpeg-Builds (около 80 МБ), проверив SHA256. Для этого нужен интернет. Далее обработка локальная.\n'
         '6. Сохрани резервную копию кэша очков, затем перенеси готовые OBB и espresso вручную.\n\n'
-        'В комплекте пустая библиотека, CPU AI-окружение и модели на 10 и 70 песнях. По умолчанию выбрана модель на 10 песнях.\n'
+        'В комплекте пустая библиотека, CPU AI-окружение и модели на 10 и 85 песнях. По умолчанию выбрана модель на 85 песнях.\n'
         'В поле «Арена AI» можно выбрать сцену из прочитанного OBB или «Разные для песен». Для существующей AI-карты используй «Пересоздать AI».\n'
         'Обучающие записи и массивы не включены: для собственного дообучения нужно подготовить эталоны по исходникам проекта.\n'
         'Извлечение аудио из готовых карт поддерживает PCM16-кэш патчера; для других сжатых FSB используй исходный MP3/ZIP. Переиспользование готовых карт декодирования не требует.\n\n'
@@ -188,7 +190,7 @@ def finish():
     with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=6, allowZip64=True) as result:
         for path in sorted(TARGET.rglob('*')):
             if path.is_file():
-                result.write(path, NAME + '/' + path.relative_to(TARGET).as_posix())
+                result.write(path, 'Pico154/' + path.relative_to(TARGET).as_posix())
     if archive.stat().st_size >= 2 * 1024**3:
         raise ValueError('GitHub release asset exceeds 2 GiB')
     (OUTPUT / 'SHA256SUMS.txt').write_text(sha(archive) + '  ' + archive.name + '\n', encoding='ascii')
@@ -198,12 +200,13 @@ def finish():
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--model-70', required=True)
+    parser.add_argument('--primary-model', required=True)
+    parser.add_argument('--model-engine', type=Path)
     args = parser.parse_args()
     if TARGET.exists():
         raise SystemExit('Use a fresh release build directory; an existing payload is never overwritten.')
     build_executable()
     copy_ai()
-    copy_models(args.model_70)
+    copy_models(args.primary_model, args.model_engine)
     notices()
     finish()
