@@ -53,9 +53,11 @@ class BackendV14Test(unittest.TestCase):
                 archive.writestr('kiss', b'game data')
             with zipfile.ZipFile(source) as archive:
                 self.assertEqual(archive.getinfo('kiss').extract_version, 45)
+                self.assertTrue(cache_builder.has_zip64(archive))
                 cache_builder.write_obb(archive, target)
             self.assertEqual(zipfile.ZIP64_LIMIT, 512)
         with zipfile.ZipFile(target) as archive:
+            self.assertFalse(cache_builder.has_zip64(archive))
             self.assertEqual(archive.read('kiss'), b'game data')
             self.assertEqual(archive.read('padding'), b'x' * 600)
             self.assertEqual(archive.getinfo('kiss').extract_version, 20)

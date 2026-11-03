@@ -29,7 +29,7 @@ from neural_autogen import (available as ai_available, engine_root, generate,
 HOME = Path(sys.executable).resolve().parent if getattr(sys, 'frozen', False) else SOURCE
 ASSETS = Path(getattr(sys, '_MEIPASS', SOURCE)) / 'assets'
 DEFAULT_BASE = ''
-VERSION = '1.5.1'
+VERSION = '1.5.2'
 
 
 class Window:

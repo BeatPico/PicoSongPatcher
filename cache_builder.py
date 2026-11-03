@@ -27,6 +27,25 @@ from maps import require,steady_lights
 _OBB_ZIP_LOCK = Lock()
 
 
+def _zip_extras(extra):
+    offset = 0
+    while offset + 4 <= len(extra):
+        tag, size = struct.unpack_from('<HH', extra, offset)
+        end = offset + 4 + size
+        yield tag, extra[offset:end]
+        offset = end
+
+
+def has_zip64(archive):
+    position = archive.fp.tell()
+    try:
+        end_record = zipfile._EndRecData(archive.fp)
+    finally:
+        archive.fp.seek(position)
+    return (end_record[0] == zipfile.stringEndArchive64
+            or any(tag == 1 for item in archive.infolist() for tag, _ in _zip_extras(item.extra)))
+
+
 def write_obb(source, destination, blobs=None, native_files=None, pruned=()):
     """Write classic ZIP offsets up to their unsigned 32-bit limit."""
     blobs, native_files = blobs or {}, native_files or {}
@@ -41,14 +60,7 @@ def write_obb(source, destination, blobs=None, native_files=None, pruned=()):
                     if item.filename in pruned or item.filename in native_files:
                         continue
                     target = copy.copy(item)
-                    extras, offset = bytearray(), 0
-                    while offset + 4 <= len(item.extra):
-                        tag, size = struct.unpack_from('<HH', item.extra, offset)
-                        end = offset + 4 + size
-                        if tag != 1:
-                            extras.extend(item.extra[offset:end])
-                        offset = end
-                    target.extra = bytes(extras)
+                    target.extra = b''.join(field for tag, field in _zip_extras(item.extra) if tag != 1)
                     if item.extract_version == 45 and item.compress_type in (zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED):
                         target.extract_version = 20
                         if target.create_version == 45:
@@ -231,13 +243,14 @@ def build(base,entries,library_root,output_root,assets,log=print,target_pack='os
             blobs={path:raw for path,(raw,crc) in replacements.items()}
             if replacements:blobs['assets/aa/catalog.json']=patch_catalog(json.loads(source.archive.read('assets/aa/catalog.json')),replacements)
             pruned={'assets/BeatmapLevelsData/'+level_id.lower() for level_id in songs if level_id not in desired}
-            if not blobs and not pruned and not native_files and source.archive.start_dir <= zipfile.ZIP64_LIMIT:
+            if not blobs and not pruned and not native_files and not has_zip64(source.archive):
                 log('Все выбранные песни уже готовы: копирование исходного OBB…');shutil.copy2(base,destination/OBB)
             else:
                 log('Запись кэша с сохранением готовых песен…')
                 write_obb(source.archive,destination/OBB,blobs,native_files,pruned)
             log('Проверка готового кэша…')
             with zipfile.ZipFile(destination/OBB) as result:
+                require(not has_zip64(result), 'Итоговый OBB содержит ZIP64. Кэш не готов к установке.')
                 require(result.testzip() is None,'Повреждён итоговый ZIP-кэш.')
                 expected=(source.names-pruned)|set(native_files)
                 require(set(result.namelist())==expected,'Итоговый список файлов отличается от ожидаемого.')
