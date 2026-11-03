@@ -1,5 +1,7 @@
 """Bounded context windows and exact elapsed-second chart stitching."""
 import copy,math
+from collections import deque
+from itertools import groupby
 
 ARRAYS=('colorNotes','bombNotes','obstacles','sliders','burstSliders','basicBeatmapEvents','colorBoostBeatmapEvents')
 def windows(duration,core=180.,context=8.):
@@ -37,7 +39,7 @@ def append_window(target,chart,offset,core_start,core_end):
             if event.get('b',0)+offset<core_start:previous[event['et']]=event
         for record in previous.values():target['basicBeatmapEvents'].append(dict(record,b=core_start))
 
-def finish(chart,duration,seams=()):
+def finish(chart,duration,seams=(),easy_intro=False):
     for family in ARRAYS:chart[family].sort(key=lambda x:x.get('b',0))
     kept=[];removed=[];last={};opposite={0:1,1:0,2:3,3:2,4:7,7:4,5:6,6:5,8:8};recut=0
     for note in chart['colorNotes']:
@@ -51,10 +53,26 @@ def finish(chart,duration,seams=()):
         if near and any(abs(n['b']-t)<.035 and (n['x'],n['y'])==(note['x'],note['y']) for n in kept[-4:]):
             removed.append(note);continue
         kept.append(note);last[hand]=note
+    before_intro=len(kept)
+    if easy_intro and kept:
+        end=kept[0]['b']+12.
+        recent=deque()
+        accepted=[]
+        for time,group in groupby(kept,key=lambda n:round(n['b'],5)):
+            notes=list(group)
+            if time<end:
+                while recent and time-recent[0]>=2.:
+                    recent.popleft()
+                if len(recent)+len(notes)>4 or (recent and time-recent[-1]<.24):
+                    continue
+                recent.extend([time]*len(notes))
+            accepted.extend(notes)
+        kept=accepted
     chart['colorNotes']=kept
     keys={(round(n['b'],5),n['c'],n['x'],n['y']) for n in kept}
     def attached(a):return (round(a['b'],5),a['c'],a['x'],a['y']) in keys
     chart['sliders']=[a for a in chart['sliders'] if attached(a) and
         (round(a['tb'],5),a['c'],a['tx'],a['ty']) in keys]
     chart['burstSliders']=[a for a in chart['burstSliders'] if attached(a)]
-    return {'seam_or_edge_notes_removed':len(removed),'seam_directions_adjusted':recut}
+    return {'seam_or_edge_notes_removed':len(removed),'seam_directions_adjusted':recut,
+            'easy_intro_notes_removed':before_intro-len(kept)}

@@ -7,6 +7,7 @@ from maps import PatcherError,require
 from engine import run_ffmpeg
 from model_profiles import profiles, resolve_profile
 from arenas import DEFAULT_ARENA, VARIED_ARENA, available_arenas, choose_arena
+from song_names import clean_song_name
 from ai_engine.gameplay_options import GAMEPLAY_REVISION,normalize_gameplay_options
 
 ALGORITHM='infernosaber-v2-pico-1.2.0'
@@ -127,6 +128,9 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
                     if tag=='title':title=match.group(1).strip()
                     else:artist=match.group(1).strip()
             if not artist and ' - ' in title:artist,title=title.split(' - ',1)
+        reference=(replace_entry or {}).get('source_audio') or source.name
+        title=clean_song_name(title,reference) or clean_song_name(source.stem)
+        artist=clean_song_name(artist,reference)
         # Keep the complete original music. No -t, trim, teaser or fade is used.
         run_ffmpeg(ffmpeg,['-i',source,'-vn','-ac','2','-ar','44100','-c:a','libvorbis','-q:a','6',folder/'song.ogg','-y'])
         cover(folder/'cover.jpg',title,key)

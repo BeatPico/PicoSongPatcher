@@ -89,7 +89,7 @@ def run(job):
         if len(plan)>1:audio.unlink()
     seams=[p[2] for p in plan[1:]];finishes={}
     for name,chart in charts.items():
-        finishes[name]=finish(chart,duration,seams)
+        finishes[name]=finish(chart,duration,seams,easy_intro=gameplay is not None and name=='Easy')
         if gameplay is not None:
             space_beginner_hazards(chart, name)
         if len(chart['colorNotes'])<4:raise ValueError(name+': запись слишком тихая или не содержит подходящих музыкальных акцентов')
