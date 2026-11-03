@@ -10,7 +10,7 @@ from functools import wraps
 import math
 import random
 
-GAMEPLAY_REVISION = 'motion-1.5-v4'
+GAMEPLAY_REVISION = 'motion-1.5-v6'
 DEFAULT_GAMEPLAY_OPTIONS = {
     'wall_modes': ['side', 'crouch'],
     'arc_probability': .35,

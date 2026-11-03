@@ -7,6 +7,25 @@ from song_names import clean_song_name
 
 
 class GenerationObjectsTest(unittest.TestCase):
+    def test_crossovers_need_space_on_both_sides_and_a_cooldown(self):
+        chart = blank()
+        chart['colorNotes'] = [dict(b=t, c=c, x=x, y=0, d=1) for t, c, x in (
+            (2., 0, 1), (2.25, 1, 1), (2.5, 0, 1), (4., 1, 1),
+            (5., 0, 2), (7.5, 0, 2), (8.1, 1, 2))]
+        report = finish(chart, 10., hand_flow=True)
+        self.assertEqual([n['b'] for n in chart['colorNotes'] if n['x']//2 != n['c']], [4., 7.5])
+        self.assertEqual(report['isolated_crossovers'], 2)
+
+    def test_running_swings_reverse_per_hand_and_stay_on_own_side(self):
+        chart = blank()
+        chart['colorNotes'] = [dict(b=t, c=c, x=x, y=0, d=d) for t, c, x, d in (
+            (2., 0, 2, 1), (2., 1, 1, 4), (2.5, 0, 3, 1), (2.5, 1, 0, 4), (4., 0, 0, 3))]
+        chart['sliders'] = [dict(b=2., tb=2.5, c=0, x=2, y=0, tx=3, ty=0)]
+        report = finish(chart, 10., hand_flow=True)
+        self.assertEqual([(n['x'], n['d']) for n in chart['colorNotes']], [(1, 1), (2, 4), (0, 0), (3, 7), (0, 3)])
+        self.assertEqual(chart['sliders'], [])
+        self.assertEqual(report['directions_adjusted'], 2)
+
     def test_section_pacing_caps_finale_and_fills_only_audible_accent(self):
         import numpy as np
         from ai_engine.section_pacing import apply_pacing

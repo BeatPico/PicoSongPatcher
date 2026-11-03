@@ -92,11 +92,11 @@ def run(job):
     pacing=AudioPacing(job['audio']) if gameplay is not None else None
     for name,chart in charts.items():
         timing_report=apply_pacing(chart,name,pacing) if pacing is not None else None
-        finishes[name]=finish(chart,duration,seams)
-        if timing_report is not None:
-            finishes[name]['section_pacing']=timing_report
         if gameplay is not None:
             space_beginner_hazards(chart, name)
+        finishes[name]=finish(chart,duration,seams,hand_flow=gameplay is not None)
+        if timing_report is not None:
+            finishes[name]['section_pacing']=timing_report
         if len(chart['colorNotes'])<4:raise ValueError(name+': запись слишком тихая или не содержит подходящих музыкальных акцентов')
         (work/(name+'.dat')).write_text(json.dumps(chart,separators=(',',':'),allow_nan=False),encoding='utf-8')
     def ordinary(value):
