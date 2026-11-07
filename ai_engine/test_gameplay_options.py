@@ -104,6 +104,24 @@ class GameplayOptionsTests(unittest.TestCase):
             apply_gameplay_options(config, normalize_gameplay_options({}))
             self.assertEqual((config.add_beat_intensity, config.jump_speed_offset, config.max_speed), before)
 
+    def test_timing_override_restores_after_failure_and_keeps_original_fallback(self):
+        from map_creation import v2_postprocessing
+        original = v2_postprocessing.postprocess_timing
+        calls = []
+        def fallback(*args, **kwargs):
+            calls.append('original')
+            return []
+        def decode(*args, **kwargs):
+            return fallback(*args, **kwargs)
+        with patch.object(v2_postprocessing, 'postprocess_timing', fallback):
+            with self.assertRaises(RuntimeError):
+                with seeded_generation(127, decode):
+                    self.assertEqual(v2_postprocessing.postprocess_timing(), [])
+                    raise RuntimeError('generation failed')
+            self.assertIs(v2_postprocessing.postprocess_timing, fallback)
+        self.assertIs(v2_postprocessing.postprocess_timing, original)
+        self.assertEqual(calls, ['original'])
+
 
 if __name__ == '__main__':
     unittest.main()

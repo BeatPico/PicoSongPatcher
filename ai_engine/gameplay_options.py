@@ -10,7 +10,10 @@ from functools import wraps
 import math
 import random
 
-GAMEPLAY_REVISION = 'motion-1.5-v8'
+GAMEPLAY_REVISION = 'motion-1.5-v10'
+DEFAULT_DIFFICULTIES = {'Easy': 1.2, 'Normal': 1.8, 'Hard': 4.0, 'Expert': 5.5, 'ExpertPlus': 6.5}
+# Median note rates measured across 12 official DLC maps, in notes per second.
+EXPERT_TIMING_TARGETS = {'Expert': 4.12, 'ExpertPlus': 4.54}
 DEFAULT_GAMEPLAY_OPTIONS = {
     'wall_modes': ['side', 'crouch'],
     'arc_probability': .35,
@@ -106,7 +109,7 @@ def space_beginner_hazards(chart, difficulty):
 
 
 @contextmanager
-def seeded_generation(seed):
+def seeded_generation(seed, timing_postprocessor=None):
     """Temporarily seed this single worker/evaluation generation context.
 
     V2Runtime imports pipeline.generate at call time. Supplying its existing
@@ -116,12 +119,13 @@ def seeded_generation(seed):
     Use one context per song variant; explicit caller generators are honored.
     """
     import numpy as np
-    from map_creation import v2_pipeline
+    from map_creation import v2_pipeline, v2_postprocessing
 
     if isinstance(seed, bool) or not isinstance(seed, (int, np.integer)) or seed < 0:
         raise ValueError('Generation seed must be a nonnegative integer')
     seed = int(seed)
     previous = v2_pipeline.generate
+    previous_timing = v2_postprocessing.postprocess_timing
     python_state, numpy_state = random.getstate(), np.random.get_state()
 
     @wraps(previous)
@@ -133,9 +137,12 @@ def seeded_generation(seed):
     random.seed(seed)
     np.random.seed(seed % (2 ** 32))
     v2_pipeline.generate = generate
+    if timing_postprocessor is not None:
+        v2_postprocessing.postprocess_timing = timing_postprocessor
     try:
         yield
     finally:
         v2_pipeline.generate = previous
+        v2_postprocessing.postprocess_timing = previous_timing
         random.setstate(python_state)
         np.random.set_state(numpy_state)

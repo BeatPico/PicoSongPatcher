@@ -9,11 +9,10 @@ from engine import run_ffmpeg
 from model_profiles import profiles, resolve_profile
 from arenas import DEFAULT_ARENA, VARIED_ARENA, available_arenas, choose_arena
 from song_names import clean_song_name
-from ai_engine.gameplay_options import GAMEPLAY_REVISION,normalize_gameplay_options
+from ai_engine.gameplay_options import DEFAULT_DIFFICULTIES, EXPERT_TIMING_TARGETS, GAMEPLAY_REVISION, normalize_gameplay_options
 
 ALGORITHM='infernosaber-v2-pico-1.2.0'
 MODEL_REVISION='e0f4c8b53f4c52fc30c5b66fd7384c0ce85884ff'
-DEFAULT_DIFFICULTIES={'Easy':1.2,'Normal':1.8,'Hard':4.0}
 ANALYSIS_PEAK = 10 ** (-1 / 20)
 
 
@@ -62,7 +61,7 @@ def needs_regeneration(song,profile,objects,gameplay_options=None,arena_mode=DEF
     return (song.get('auto_algorithm')!=ALGORITHM or song.get('ai_model','base')!=profile['id']
             or (profile['id']!='base' and song.get('ai_model_revision')!=profile['revision'])
             or any(bool(stored.get(key,False))!=value for key,value in objects.items())
-            or song.get('ai_difficulties', DEFAULT_DIFFICULTIES)!=DEFAULT_DIFFICULTIES
+            or song.get('ai_difficulties')!=DEFAULT_DIFFICULTIES
             or song.get('ai_gameplay_revision')!=GAMEPLAY_REVISION or song.get('ai_gameplay_options')!=gameplay_options
             or song.get('ai_arena_mode',DEFAULT_ARENA)!=arena_mode)
 
@@ -83,7 +82,7 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
         'Выбери MP3, WAV, FLAC, M4A, OGG, AAC, WMA или OPUS.')
     require(available(),'Не найден полный AI-движок. Распакуй комплект целиком вместе с каталогом ai_engine.')
     difficulties=dict(difficulties or DEFAULT_DIFFICULTIES)
-    require(difficulties and all(n in ['Easy','Normal','Hard','Expert','ExpertPlus'] and 0.5<=v<=10 for n,v in difficulties.items()),'Неверные сложности AI-карты.')
+    require(difficulties and all(n in DEFAULT_DIFFICULTIES and 0.5<=v<=10 for n,v in difficulties.items()),'Неверные сложности AI-карты.')
     if bpm_override is not None:require(40<=float(bpm_override)<=320,'BPM должен быть от 40 до 320.')
     fingerprint=hashlib.sha256()
     with source.open('rb') as f:
@@ -93,7 +92,8 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
     cache=library.state.get('cache_obb') or library.state.get('source_obb') or library.state.get('base_obb')
     arena=choose_arena(arena_mode,available_arenas(cache,assets),source_hash) if arena_mode!=DEFAULT_ARENA else DEFAULT_ARENA
     seed_fingerprint=fingerprint.copy()
-    seed_fingerprint.update(json.dumps([ALGORITHM,MODEL_REVISION,bpm_override,difficulties],sort_keys=True).encode())
+    seed_difficulties = {name: nps for name, nps in difficulties.items() if name not in EXPERT_TIMING_TARGETS}
+    seed_fingerprint.update(json.dumps([ALGORITHM,MODEL_REVISION,bpm_override,seed_difficulties or difficulties],sort_keys=True).encode())
     generation_seed=int(seed_fingerprint.hexdigest()[:8],16)%2147483647
     profile=selected_model(library)
     objects=object_options(library)

@@ -9,10 +9,11 @@ import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parent
-VERSION = '1.5.4'
+VERSION = '1.6.0'
 MODEL_10 = 'finetune-20261102T113535114682Z'
 MODEL_40 = 'finetune-20261102T174826024561Z'
 NAME = 'PicoSongPatcher-' + VERSION + '-Windows-x64'
+PORTABLE_ROOT = 'Pico' + VERSION.replace('.', '')
 WORK = ROOT / 'release_build' / VERSION
 TARGET = WORK / 'dist' / NAME
 OUTPUT = ROOT / 'release_artifacts' / ('v' + VERSION)
@@ -87,6 +88,41 @@ def copy_ai():
             shutil.copy2(path, target / path.name)
 
 
+def public_model_metadata(bundle, models, shared):
+    """Keep inference contracts and public provenance in exported sidecars."""
+    for path in bundle.glob('*/report.json'):
+        path.unlink()
+    for path in bundle.glob('*/manifest.json'):
+        value = json.loads(path.read_text(encoding='utf-8'))
+        keys = ('kind', 'schema_version', 'stage', 'status', 'checkpoint', 'checkpoint_sha256',
+                'representation', 'normalization', 'normalization_sha256', 'compatibility',
+                'vocabularies', 'encoder_identity')
+        public = {key: value[key] for key in keys if key in value}
+        if 'training' in value:
+            training_keys = ('architecture', 'status', 'parameters', 'input_shapes', 'bomb_presence',
+                             'split_identity', 'stage_split', 'batch_size', 'optimizer', 'clipnorm',
+                             'conditioning', 'intensity_noise_std', 'monitor', 'training_settings')
+            public['training'] = {key: value['training'][key] for key in training_keys if key in value['training']}
+        path.write_text(json.dumps(public, indent=2), encoding='utf-8')
+    path = bundle / 'bundle.json'
+    original = json.loads(path.read_text(encoding='utf-8'))
+    keys = ('kind', 'schema_version', 'status', 'model_stages', 'encoder', 'data_settings',
+            'normalization_sha256', 'vocabularies_sha256', 'calibrations', 'pico_timing_targets', 'limitations')
+    public = {key: original[key] for key in keys if key in original}
+    files = {}
+    for name, record in original['files'].items():
+        file = bundle / name
+        if file.is_file():
+            files[name] = {'sha256': sha(file), 'bytes': file.stat().st_size}
+        elif (file.relative_to(models).as_posix() in shared):
+            files[name] = record
+        elif not (name.endswith('/report.json') or name.startswith('lighting/')):
+            raise ValueError('Missing required model file: ' + name)
+    public['files'] = files
+    public['pico_release'] = VERSION
+    path.write_text(json.dumps(public, indent=2), encoding='utf-8')
+
+
 def copy_models(primary, model_engine=None):
     source, target = Path(model_engine or ROOT / 'ai_engine'), TARGET / 'ai_engine'
     models = target / 'models'
@@ -95,8 +131,8 @@ def copy_models(primary, model_engine=None):
     for identifier in (MODEL_10, primary):
         origin = source / 'models/experiments' / identifier
         record = json.loads((origin / 'profile.json').read_text(encoding='utf-8'))
-        recordings = 10 if identifier == MODEL_10 else record.get('dataset_recordings', 0)
-        if record.get('status') != 'evaluated' or recordings < 10:
+        recordings = 10 if identifier == MODEL_10 else record.get('dataset_recordings')
+        if record.get('status') != 'evaluated' or not (origin / 'bundle/bundle.json').is_file():
             raise ValueError('The expected evaluated model is required: ' + identifier)
         destination = models / 'experiments' / identifier
         for path in sorted((origin / 'bundle').rglob('*')):
@@ -112,8 +148,11 @@ def copy_models(primary, model_engine=None):
                 first[digest] = relative
             output.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(path, output)
-        profile = {'id': identifier, 'label': 'Дообученная · ' + str(recordings) + ' песен', 'status': 'evaluated', 'experimental': True,
-                   'dataset_recordings': recordings, 'report': 'evaluation'}
+        label = ('Дообученная · 10 песен' if identifier == MODEL_10 else record['label'].replace(' (тест)', ''))
+        profile = {'id': identifier, 'label': label, 'status': 'evaluated', 'experimental': True,
+                   'report': 'evaluation'}
+        if recordings is not None:
+            profile['dataset_recordings'] = recordings
         (destination / 'profile.json').write_text(json.dumps(profile, ensure_ascii=False, indent=2), encoding='utf-8')
         report = destination / 'evaluation'
         report.mkdir()
@@ -122,12 +161,30 @@ def copy_models(primary, model_engine=None):
             for name in ('report.html', 'report_ru.txt', 'aggregate_summary.json'):
                 if (evaluation / name).is_file():
                     shutil.copy2(evaluation / name, report / name)
+            if (evaluation / 'dlc.json').is_file():
+                results = json.loads((evaluation / 'dlc.json').read_text(encoding='utf-8'))
+                summary = {'source_profile': results['source_profile'], 'dlc_splits': results['dlc_splits'],
+                           'stages': {stage: {'selected_weights_changed': row['training']['selected_weights_changed'],
+                               'best_epoch': row['training']['best_epoch'],
+                               **{label: {arm: {key: metrics[key] for key in ('loss', 'examples', 'conditioning')}
+                                          for arm, metrics in row[label].items()}
+                                  for label in ('dlc_test', 'previous_test')}}
+                               for stage, row in results['stages'].items()}}
+                (report / 'aggregate_summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding='utf-8')
+                (report / 'report_ru.txt').write_text(
+                    'Профиль продолжает обучение на примерах DLC. Использованы 19 записей. '
+                    '12 записей выделены для обучения, 4 для выбора весов и 3 для контрольной проверки.\n'
+                    'Выбраны обновлённые веса плотности. Для тайминга проверка выбрала исходные веса. '
+                    'Разреженный прогноз дополняется звуковыми акцентами с ограничениями плотности.\n'
+                    'Полные карты проверены на ПК. Удобство движений оценивайте в очках.\n', encoding='utf-8')
         else:
             shutil.copy2(ROOT / 'TRAINING_RESULTS.md', report / 'README.md')
     (models / 'shared_weights.json').write_text(json.dumps(shared, indent=2), encoding='utf-8')
+    for identifier in (MODEL_10, primary):
+        public_model_metadata(models / 'experiments' / identifier / 'bundle', models, shared)
     (target / 'model_selection.json').write_text(json.dumps({
         'hidden': ['base', MODEL_40], 'default': primary,
-        'aliases': {'base': MODEL_10, MODEL_40: primary},
+        'aliases': {'base': MODEL_10, MODEL_40: primary, 'pacing-85-153': primary, 'pacing-85-dlc-154': primary},
     }, indent=2), encoding='utf-8')
 
 
@@ -164,7 +221,8 @@ def finish():
         '4. Добавляй карты или MP3 и собирай новый кэш. Исходные файлы и устройство программа не перезаписывает.\n'
         '5. При первой обработке аудио программа загрузит FFmpeg с официального репозитория BtbN/FFmpeg-Builds (около 80 МБ), проверив SHA256. Для этого нужен интернет. Далее обработка локальная.\n'
         '6. Сохрани резервную копию кэша очков, затем перенеси готовые OBB и espresso вручную.\n\n'
-        'В комплекте пустая библиотека, CPU AI-окружение и модели на 10 и 85 песнях. По умолчанию выбрана модель на 85 песнях.\n'
+        'В комплекте пустая библиотека, CPU AI-окружение и два профиля. По умолчанию выбран профиль DLC и тайминга. Второй профиль обучен на 10 песнях.\n'
+        'Из аудио создаются Easy, Normal, Hard, Expert и Expert+. Для старых карт нажмите «Пересоздать AI».\n'
         'В поле «Арена AI» можно выбрать сцену из прочитанного OBB или «Разные для песен». Для существующей AI-карты используй «Пересоздать AI».\n'
         'Обучающие записи и массивы не включены: для собственного дообучения нужно подготовить эталоны по исходникам проекта.\n'
         'Извлечение аудио из готовых карт поддерживает PCM16-кэш патчера; для других сжатых FSB используй исходный MP3/ZIP. Переиспользование готовых карт декодирования не требует.\n\n'
@@ -190,7 +248,7 @@ def finish():
     with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=6, allowZip64=True) as result:
         for path in sorted(TARGET.rglob('*')):
             if path.is_file():
-                result.write(path, 'Pico154/' + path.relative_to(TARGET).as_posix())
+                result.write(path, PORTABLE_ROOT + '/' + path.relative_to(TARGET).as_posix())
     if archive.stat().st_size >= 2 * 1024**3:
         raise ValueError('GitHub release asset exceeds 2 GiB')
     (OUTPUT / 'SHA256SUMS.txt').write_text(sha(archive) + '  ' + archive.name + '\n', encoding='ascii')

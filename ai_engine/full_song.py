@@ -1,23 +1,97 @@
 """Bounded context windows and exact elapsed-second chart stitching."""
 import copy,math
+from bisect import bisect_left, bisect_right
 from collections import deque
 from itertools import groupby
 
 ARRAYS=('colorNotes','bombNotes','obstacles','sliders','burstSliders','basicBeatmapEvents','colorBoostBeatmapEvents')
 OPPOSITE = {0: 1, 1: 0, 2: 3, 3: 2, 4: 7, 7: 4, 5: 6, 6: 5}
+HIGH_ROWS = {'Easy': (.03, 4.), 'Normal': (.05, 3.5), 'Hard': (.08, 3.),
+             'Expert': (.10, 2.5), 'ExpertPlus': (.12, 2.)}
 
 
-def _hand_flow(chart, notes):
+def same_swing(first, second):
+    if (first['c'] != second['c'] or first['d'] != second['d']
+            or first.get('a', 0) != second.get('a', 0)
+            or abs(first['b'] - second['b']) > .0001):
+        return False
+    return ((first['d'] in (0, 1) and first['x'] == second['x'] and abs(first['y'] - second['y']) == 1)
+            or (first['d'] in (2, 3) and first['y'] == second['y'] and abs(first['x'] - second['x']) == 1))
+
+
+def crossover_allowed(chart, times, time, difficulty=None):
+    left, right = bisect_left(times, time - .0001), bisect_right(times, time + .0001)
+    before = time - times[left - 1] if left else math.inf
+    after = times[right] - time if right < len(times) else math.inf
+    limit = {'Easy': 3, 'Normal': 4, 'Hard': 5, 'Expert': 6, 'ExpertPlus': 7}.get(difficulty, 5)
+    return (min(before, after) >= .55
+            and bisect_right(times, time + 1.) - bisect_left(times, time - 1.) <= limit
+            and not any(w['b'] - .8 <= time <= w['b'] + w['d'] + .8 for w in chart['obstacles'])
+            and not any(abs(b['b'] - time) < .8 for b in chart['bombNotes'])
+            and not any(a['b'] - .5 <= time <= a['tb'] + .5
+                        for a in chart['sliders'] + chart['burstSliders']))
+
+
+def _lower_high_notes(chart, notes, difficulty, audio):
+    if difficulty not in HIGH_ROWS:
+        return notes, set(), {}
+    fraction, spacing = HIGH_ROWS[difficulty]
+    quota = int(len(notes) * fraction)
+    high = [i for i, note in enumerate(notes) if note['y'] == 2]
+    ranked = sorted(high, key=lambda i: (
+        -float(audio.accents[audio.frame(notes[i]['b'])]) if audio is not None else 0., notes[i]['b']))
+    retained, high_times = set(), []
+    for index in ranked:
+        time = notes[index]['b']
+        if len(retained) < quota and all(abs(time - other) >= spacing for other in high_times):
+            retained.add(index)
+            high_times.append(time)
+    occupied = {(round(n['b'], 5), n['x'], n['y']) for n in notes}
+    result, changed = [], set()
+    lowered = dropped = 0
+    for index, note in enumerate(notes):
+        if note['y'] != 2 or index in retained:
+            result.append(note)
+            continue
+        time, hand, column = note['b'], note['c'], note['x']
+        old = (round(time, 5), hand, column, 2)
+        for lane, row in ((column, 1), (column, 0), (1 + hand, 1), (1 + hand, 0), (3 * hand, 1), (3 * hand, 0)):
+            cell = (round(time, 5), lane, row)
+            if (cell in occupied or any(w['b'] <= time < w['b'] + w['d'] and
+                    w['x'] <= lane < w['x'] + w['w'] and w['y'] <= row < w['y'] + w['h']
+                    for w in chart['obstacles'])
+                    or any(b['x'] == lane and b['y'] == row and abs(b['b'] - time) < .035
+                           for b in chart['bombNotes'])):
+                continue
+            note.update(x=lane, y=row)
+            occupied.add(cell)
+            changed.update((old, (round(time, 5), hand, lane, row)))
+            lowered += 1
+            result.append(note)
+            break
+        else:
+            changed.add(old)
+            dropped += 1
+    return result, changed, {'upper_notes_lowered': lowered, 'upper_notes_dropped': dropped,
+                             'upper_row_limit': quota}
+
+
+def _hand_flow(chart, notes, difficulty=None):
     previous, changed = {}, set()
     result = []
     moved = reversed_cuts = blocked = crossovers = 0
     last_crossover = -math.inf
+    times = [n['b'] for n in notes]
+    at_time, previous_group = None, {}
     for index, note in enumerate(notes):
         time, hand, column, row = note['b'], note['c'], note['x'], note['y']
+        if at_time is None or abs(time - at_time) > .0001:
+            previous.update(previous_group)
+            previous_group = {}
+            at_time = time
         if column // 2 != hand:
-            before = time - notes[index - 1]['b'] if index else math.inf
-            after = notes[index + 1]['b'] - time if index + 1 < len(notes) else math.inf
-            isolated = min(before, after) >= .55 and time - last_crossover >= 3.
+            isolated = (crossover_allowed(chart, times, time, difficulty)
+                        and (time - last_crossover >= 3. or time == last_crossover))
             preferred = 3 - column
             lanes = (preferred, 4 * hand + 1 - preferred)
             if isolated:
@@ -27,7 +101,10 @@ def _hand_flow(chart, notes):
                            and w['y'] <= row < w['y'] + w['h'] for w in chart['obstacles'])
                 bomb = any(b['x'] == lane and b['y'] == row and abs(b['b'] - time) < .035
                            for b in chart['bombNotes'])
-                if not wall and not bomb:
+                occupied = any(n is not note and abs(n['b'] - time) < .035
+                               and n['x'] == lane and n['y'] == row
+                               and (n['x']//2 == n['c'] or isolated) for n in notes)
+                if not wall and not bomb and not occupied:
                     note['x'] = lane
                     if lane == column:
                         last_crossover = time
@@ -49,12 +126,14 @@ def _hand_flow(chart, notes):
                     note['a'] = prior.get('a', 0)
                     reversed_cuts += 1
                     changed.add((round(time, 5), hand, column, row))
-            previous[hand] = note
-        else:
-            previous.pop(hand, None)
+        simultaneous = next((n for n in reversed(result[-3:]) if abs(n['b'] - time) <= .0001 and n['c'] == hand), None)
+        if simultaneous is not None and not same_swing(simultaneous, note):
+            blocked += 1
+            continue
         if note['x'] != column:
             changed.add((round(time, 5), hand, column, row))
         result.append(note)
+        previous_group[hand] = note if note['d'] in OPPOSITE else None
     return result, changed, {'moved_to_own_side': moved, 'directions_adjusted': reversed_cuts,
                              'blocked_notes_removed': blocked, 'isolated_crossovers': crossovers}
 
@@ -93,14 +172,14 @@ def append_window(target,chart,offset,core_start,core_end):
             if event.get('b',0)+offset<core_start:previous[event['et']]=event
         for record in previous.values():target['basicBeatmapEvents'].append(dict(record,b=core_start))
 
-def finish(chart,duration,seams=(),easy_intro=False,hand_flow=False):
+def finish(chart,duration,seams=(),easy_intro=False,hand_flow=False,difficulty=None,audio=None):
     for family in ARRAYS:chart[family].sort(key=lambda x:x.get('b',0))
     kept=[];removed=[];last={};opposite={0:1,1:0,2:3,3:2,4:7,7:4,5:6,6:5,8:8};recut=0
     for note in chart['colorNotes']:
         t=note['b'];hand=note['c'];near=any(abs(t-s)<.30 for s in seams)
         if not 1.25<=t<duration-.35:removed.append(note);continue
         previous=last.get(hand)
-        if near and previous and t-previous['b']<.12:
+        if near and previous and t-previous['b']<.12 and not same_swing(previous,note):
             removed.append(note);continue
         if near and previous and .12<=t-previous['b']<1.0 and note['d']==previous['d'] and note['d']!=8:
             note['d']=opposite[note['d']];recut+=1
@@ -126,7 +205,10 @@ def finish(chart,duration,seams=(),easy_intro=False,hand_flow=False):
     flow_report={}
     changed=set()
     if hand_flow:
-        kept,changed,flow_report=_hand_flow(chart,kept)
+        kept,changed,height_report=_lower_high_notes(chart,kept,difficulty,audio)
+        kept,flow_changed,flow_report=_hand_flow(chart,kept,difficulty)
+        changed.update(flow_changed)
+        flow_report.update(height_report)
     chart['colorNotes']=kept
     keys={(round(n['b'],5),n['c'],n['x'],n['y']) for n in kept}
     keys.difference_update(changed)

@@ -29,7 +29,7 @@ from neural_autogen import (available as ai_available, engine_root, generate,
 HOME = Path(sys.executable).resolve().parent if getattr(sys, 'frozen', False) else SOURCE
 ASSETS = Path(getattr(sys, '_MEIPASS', SOURCE)) / 'assets'
 DEFAULT_BASE = ''
-VERSION = '1.5.4'
+VERSION = '1.6.0'
 
 
 class Window:
@@ -660,7 +660,7 @@ class Window:
         if not paths:
             return
         value = simpledialog.askstring('Нейросеть: полные песни',
-                                       'Создам Easy, Normal и Hard для всей записи на этом ПК.\nОбработка может занять несколько минут.\n\nBPM: «Авто» или известный темп (40–320).\nОдно число применяется ко всем выбранным файлам.',
+                                       'Создам пять сложностей от Easy до Expert+ для всей записи.\nОбработка может занять несколько минут.\n\nBPM: «Авто» или известный темп (40–320).\nОдно число применяется ко всем выбранным файлам.',
                                        initialvalue='Авто', parent=self.root)
         if value is None:
             return

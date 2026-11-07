@@ -2,6 +2,7 @@
 import os,sys,json,math,subprocess,time,traceback,wave
 from pathlib import Path
 from contextlib import nullcontext
+from functools import partial
 ROOT=Path(__file__).resolve().parent
 sys.path[:0]=[str(ROOT),str(ROOT/'infernosaber'),str(ROOT.parent)]
 os.chdir(ROOT/'infernosaber')
@@ -19,11 +20,12 @@ def run(job):
     from map_creation.v2_runtime import V2Runtime
     from map_creation.v2_export import serialize_beatmap
     from full_song import windows,blank,append_window,finish
-    from section_pacing import AudioPacing, apply_pacing
+    from section_pacing import AudioPacing, apply_pacing, limit_note_count
     from stock_patterns import add_stock_patterns
     import numpy as np
     from gameplay_options import (normalize_gameplay_options, apply_gameplay_options, filter_gameplay_objects,
-                                  seeded_generation, space_beginner_hazards, GAMEPLAY_REVISION)
+                                  seeded_generation, space_beginner_hazards, GAMEPLAY_REVISION,
+                                  DEFAULT_DIFFICULTIES, EXPERT_TIMING_TARGETS)
     gameplay=normalize_gameplay_options(job.get('object_options'))
     seed=int(job.get('seed',127))
     np.random.seed(seed)
@@ -47,6 +49,7 @@ def run(job):
     configure_inference();emit('Загрузка обученных моделей…')
     emit('Объекты: стены '+('вкл.' if config.add_obstacle_flag else 'выкл.')+', бомбы '+('вкл.' if config.add_bombs_flag else 'выкл.'))
     runtime=V2Runtime(bundle)
+    timing_targets={**EXPERT_TIMING_TARGETS, **runtime.bundle.get('pico_timing_targets', {})} if gameplay is not None else {}
     with wave.open(job['audio'],'rb') as wav:duration=wav.getnframes()/wav.getframerate()
     plan=windows(duration);charts={name:blank() for name in job['difficulties']};reports=[]
     work=Path(job['output']);work.mkdir(parents=True,exist_ok=True)
@@ -67,13 +70,21 @@ def run(job):
             if 'No positive tempo' not in str(error):raise
             prepared=runtime.prepare_audio(audio,120.)
             emit('В этом фрагменте нет устойчивого BPM: используется анализ акцентов.')
+        window_pacing=AudioPacing(audio) if timing_targets.keys() & charts.keys() else None
         for difficulty_index,(name,nps) in enumerate(job['difficulties'].items()):
             emit(f'{name}: моменты ударов, рисунок рук и направления…')
             with scoped_settings():
                 _difficulty_settings(4*float(nps))
                 apply_gameplay_options(config,gameplay)
                 variant_seed=(seed+1000003*(i-1)+1009*difficulty_index)%(2**32)
-                with seeded_generation(variant_seed) if gameplay is not None else nullcontext():
+                timing_postprocessor=None
+                if name in timing_targets:
+                    from timing_budget import postprocess_budget
+                    from map_creation.v2_postprocessing import postprocess_timing
+                    target=timing_targets[name] if nps == DEFAULT_DIFFICULTIES.get(name) else nps
+                    timing_postprocessor=partial(postprocess_budget, audio=window_pacing,
+                        difficulty=name, target_nps=float(target), postprocess_timing=postprocess_timing)
+                with seeded_generation(variant_seed, timing_postprocessor) if gameplay is not None else nullcontext():
                     result=runtime.generate(prepared,float(nps),logger=lambda message:None)
                 object_report=filter_gameplay_objects(result.state,gameplay)
                 if object_report is not None:
@@ -91,14 +102,31 @@ def run(job):
         if len(plan)>1:audio.unlink()
     seams=[p[2] for p in plan[1:]];finishes={}
     pacing=AudioPacing(job['audio']) if gameplay is not None else None
-    for name,chart in charts.items():
-        timing_report=apply_pacing(chart,name,pacing) if pacing is not None else None
+    prior_difficulty={'Normal':'Easy', 'Expert':'Hard', 'ExpertPlus':'Expert'}
+    if 'Hard' in timing_targets:
+        prior_difficulty['Hard']='Normal'
+    for name in DEFAULT_DIFFICULTIES:
+        if name not in charts:
+            continue
+        chart=charts[name]
+        easier_notes=charts.get(prior_difficulty.get(name), {}).get('colorNotes', ())
+        timing_report=apply_pacing(chart,name,pacing,easier_notes) if pacing is not None else None
         if gameplay is not None:
             space_beginner_hazards(chart, name)
-        finishes[name]=finish(chart,duration,seams,hand_flow=gameplay is not None)
+        finishes[name]=finish(chart,duration,seams,hand_flow=gameplay is not None,difficulty=name,audio=pacing)
         if timing_report is not None:
             finishes[name]['section_pacing']=timing_report
             finishes[name]['stock_patterns']=add_stock_patterns(chart,name,pacing)
+            finishes[name]['final_geometry']=finish(chart,duration,seams,hand_flow=True,difficulty=name,audio=pacing)
+    if pacing is not None:
+        for harder in reversed(DEFAULT_DIFFICULTIES):
+            easier=prior_difficulty.get(harder)
+            if {easier, harder} <= charts.keys() and len(charts[harder]['colorNotes']) >= 4:
+                removed=limit_note_count(charts[easier],max(4,len(charts[harder]['colorNotes']) - 1),pacing)
+                if removed:
+                    finishes[easier]['difficulty_balance']={'removed':removed,
+                        'cleanup':finish(charts[easier],duration,hand_flow=True,difficulty=easier,audio=pacing)}
+    for name,chart in charts.items():
         if len(chart['colorNotes'])<4:raise ValueError(name+': запись слишком тихая или не содержит подходящих музыкальных акцентов')
         (work/(name+'.dat')).write_text(json.dumps(chart,separators=(',',':'),allow_nan=False),encoding='utf-8')
     def ordinary(value):

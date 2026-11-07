@@ -4,6 +4,7 @@ from itertools import groupby
 import wave
 
 import numpy as np
+from ai_engine.full_song import same_swing
 
 
 class AudioPacing:
@@ -46,14 +47,16 @@ RULES = {
     'Easy': (4, 5, .26, .42, 3.8),
     'Normal': (6, 8, .19, .30, 3.1),
     'Hard': (9, 12, .125, .21, 2.55),
+    'Expert': (13, 18, .095, .155, 2.25),
+    'ExpertPlus': (16, 22, .075, .12, 1.95),
 }
 
 
-def apply_pacing(chart, difficulty, audio):
-    if difficulty not in RULES or not chart['colorNotes']:
+def apply_pacing(chart, difficulty, audio, easier_notes=()):
+    if difficulty not in RULES or not (chart['colorNotes'] or easier_notes):
         return {'removed': 0, 'gap_notes': 0}
     quiet, lively, minimum, hand_gap, max_gap = RULES[difficulty]
-    crouch_max = {'Easy': 1.35, 'Normal': 1.7, 'Hard': 2.1}[difficulty]
+    crouch_max = {'Easy': 1.35, 'Normal': 1.7, 'Hard': 2.1, 'Expert': 2.4, 'ExpertPlus': 2.65}[difficulty]
     shortened_walls = 0
     for wall in chart['obstacles']:
         limit = crouch_max if wall['y'] >= 2 and wall['w'] >= 3 else crouch_max + 1.
@@ -61,7 +64,7 @@ def apply_pacing(chart, difficulty, audio):
             wall['d'] = limit
             shortened_walls += 1
     original = sorted(chart['colorNotes'], key=lambda note: note['b'])
-    intro_end = original[0]['b'] + 12
+    intro_end = (original or easier_notes)[0]['b'] + 12
     accepted, by_hand = [], [[], []]
 
     def fits(time, notes):
@@ -88,11 +91,19 @@ def apply_pacing(chart, difficulty, audio):
         for note in notes:
             insort(by_hand[note['c']], time)
 
+    def clear(time, hand):
+        return (not any(w['b'] - .25 <= time <= w['b'] + w['d'] + .35 for w in chart['obstacles'])
+                and not any(abs(b['b'] - time) < .4 for b in chart['bombNotes'])
+                and not any(a['c'] == hand and a['b'] < time < a['tb']
+                            for a in chart['sliders'] + chart['burstSliders']))
+
     candidates = []
     for time, group in groupby(original, key=lambda note: round(note['b'], 4)):
         notes = []
         for note in group:
-            if all(n['c'] != note['c'] and (n['x'], n['y']) != (note['x'], note['y']) for n in notes):
+            if len(notes) < 2 and all(
+                    (n['c'] != note['c'] and (n['x'], n['y']) != (note['x'], note['y']))
+                    or same_swing(n, note) for n in notes):
                 notes.append(note)
         frame = audio.frame(time)
         if audio.audible[frame]:
@@ -118,11 +129,7 @@ def apply_pacing(chart, difficulty, audio):
             direction = 0 if prior and prior['d'] == 1 else 1
             for t in sorted(peaks, key=lambda value: abs(value - target)):
                 time = round(float(t), 5)
-                if any(w['b'] - .25 <= time <= w['b'] + w['d'] + .35 for w in chart['obstacles']):
-                    continue
-                if any(abs(b['b'] - time) < .4 for b in chart['bombNotes']):
-                    continue
-                if any(a['c'] == hand and a['b'] < time < a['tb'] for a in chart['sliders'] + chart['burstSliders']):
+                if not clear(time, hand):
                     continue
                 note = {'b': time, 'x': 1 + hand, 'y': 0, 'c': hand, 'd': direction, 'a': 0}
                 if fits(time, [note]):
@@ -133,6 +140,41 @@ def apply_pacing(chart, difficulty, audio):
                     break
             else:
                 cursor = target
+    supplemented = 0
+    if easier_notes:
+        deficit = len(easier_notes) + 1 - sum(len(group) for _, group in accepted)
+        if deficit > 0:
+            # Restore shared musical accents only where the denser chart has room.
+            for note in sorted(easier_notes, key=lambda n: (-audio.accents[audio.frame(n['b'])], n['b'])):
+                time, hand = note['b'], note['c']
+                candidate = dict(note, x=1 + hand, y=0)
+                if clear(time, hand) and fits(time, [candidate]):
+                    add(time, [candidate])
+                    supplemented += 1
+                    if supplemented == deficit:
+                        break
     chart['colorNotes'] = [note for _, group in accepted for note in group]
     return {'removed': removed, 'gap_notes': filled, 'shortened_walls': shortened_walls,
-            'active_sections_fraction': float(np.mean(audio.active))}
+            'active_sections_fraction': float(np.mean(audio.active)),
+            'shared_accents_added': supplemented}
+
+
+def limit_note_count(chart, limit, audio):
+    """Thin crowded passages first while retaining the first and last onsets."""
+    notes = chart['colorNotes']
+    if len(notes) <= limit:
+        return 0
+    groups = [(time, list(group)) for time, group in groupby(notes, key=lambda n: round(n['b'], 5))]
+    remaining = len(notes)
+    while remaining > limit:
+        index = min(range(1, len(groups) - 1), key=lambda i: (
+            groups[i + 1][0] - groups[i - 1][0], audio.accents[audio.frame(groups[i][0])]))
+        _, group = groups[index]
+        if len(group) > remaining - limit:
+            group.pop()
+            remaining -= 1
+        else:
+            groups.pop(index)
+            remaining -= len(group)
+    chart['colorNotes'] = [note for _, group in groups for note in group]
+    return len(notes) - remaining
