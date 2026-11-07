@@ -190,9 +190,9 @@ def copy_models(primary, model_engine=None):
 
 def notices():
     target = TARGET / 'licenses'
-    target.mkdir()
+    target.mkdir(exist_ok=True)
     shutil.copy2(ROOT / 'ai_engine/infernosaber/LICENSE', target / 'InfernoSaber-MIT.txt')
-    shutil.copy2(Path(sys.executable).parent / 'LICENSE.txt', target / 'Python-3.14.txt')
+    shutil.copy2(Path(sys.base_prefix) / 'LICENSE.txt', target / 'Python-3.14.txt')
     for path in (LAB / 'build_packages').glob('pyinstaller-*.dist-info/licenses/COPYING.txt'):
         shutil.copy2(path, target / 'PyInstaller-bootloader.txt')
     (target / 'README.txt').write_text(
