@@ -10,6 +10,7 @@ from model_profiles import profiles, resolve_profile
 from arenas import DEFAULT_ARENA, VARIED_ARENA, available_arenas, choose_arena
 from song_names import clean_song_name
 from ai_engine.gameplay_options import DEFAULT_DIFFICULTIES, EXPERT_TIMING_TARGETS, GAMEPLAY_REVISION, normalize_gameplay_options
+from ai_engine.jump_settings import jump_settings
 
 ALGORITHM='infernosaber-v2-pico-1.2.0'
 MODEL_REVISION='e0f4c8b53f4c52fc30c5b66fd7384c0ce85884ff'
@@ -167,7 +168,7 @@ def generate(source,library,assets,bpm_override=None,log=print,difficulties=None
             '_songFilename':'song.ogg','_coverImageFilename':'cover.jpg','_environmentName':arena,
             '_difficultyBeatmapSets':[{'_beatmapCharacteristicName':'Standard','_difficultyBeatmaps':[
                 {'_difficulty':name,'_difficultyRank':ranks[name],'_beatmapFilename':name+'.dat',
-                 '_noteJumpMovementSpeed':min(20,10+difficulties[name]*1.5),'_noteJumpStartBeatOffset':0}
+                 **jump_settings(name,difficulties[name],60.)}
                 for name in difficulties]}]}
         (folder/'Info.dat').write_text(json.dumps(info,ensure_ascii=False),encoding='utf-8')
         for name in difficulties:shutil.copy2(charts/(name+'.dat'),folder/(name+'.dat'))

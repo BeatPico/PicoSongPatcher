@@ -10,7 +10,7 @@ from functools import wraps
 import math
 import random
 
-GAMEPLAY_REVISION = 'motion-1.5-v10'
+GAMEPLAY_REVISION = 'motion-1.6-v11'
 DEFAULT_DIFFICULTIES = {'Easy': 1.2, 'Normal': 1.8, 'Hard': 4.0, 'Expert': 5.5, 'ExpertPlus': 6.5}
 # Median note rates measured across 12 official DLC maps, in notes per second.
 EXPERT_TIMING_TARGETS = {'Expert': 4.12, 'ExpertPlus': 4.54}

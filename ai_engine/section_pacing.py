@@ -47,8 +47,10 @@ RULES = {
     'Easy': (4, 5, .26, .42, 3.8),
     'Normal': (6, 8, .19, .30, 3.1),
     'Hard': (9, 12, .125, .21, 2.55),
-    'Expert': (13, 18, .095, .155, 2.25),
-    'ExpertPlus': (16, 22, .075, .12, 1.95),
+    # Official DLC fast-hand gaps are typically .255s/.186s (5th percentile).
+    # Leave room for fast passages without demanding 8 same-hand swings/sec.
+    'Expert': (13, 18, .095, .20, 2.25),
+    'ExpertPlus': (16, 22, .075, .16, 1.95),
 }
 
 
